@@ -1,0 +1,4 @@
+# requirements.txt
+
+# Add any external libraries here
+# e.g. click>=7.0
