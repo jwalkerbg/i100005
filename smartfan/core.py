@@ -77,8 +77,8 @@ def run_app(config: Dict):
                 version_bytes, serial_bytes = byte_array.split(b'\0',1)
                 version = version_bytes.decode('ascii')
                 serial = serial_bytes.decode('ascii').rstrip('\x00')
-                print(f"Version: {version}")
-                print(f"Serial Number: {serial}")
+                logger.info(f"Version: {version}")
+                logger.info(f"Serial Number: {serial}")
 
             # payload = ms_host.ms_serial("2407-0002")
 
