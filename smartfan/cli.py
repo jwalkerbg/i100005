@@ -1,6 +1,6 @@
 import argparse
+import logging
 import mqttms
-from mqttms import logger_module
 from mqttms import config
 
 from smartfan.core import run_app
