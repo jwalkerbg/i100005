@@ -37,6 +37,10 @@ def parse_args():
 def main():
     """Main entry point of the CLI."""
 
+    mqttms_logger = logging.getLogger('mqttms')
+    mqttms_logger.propagate = False
+    mqttms_logger.setLevel(logging.INFO)
+
     # Step 0: Log the beginning
     logger.info("mqttms beginning")
 
