@@ -3,11 +3,7 @@
 import time
 import struct
 from typing import Dict
-import mqttms
-from mqttms.mqtt_handler import MQTTHandler
-from mqttms.ms_protocol import MSProtocol
-from mqttms.mqtt_dispatcher import MQTTDispatcher
-from mqttms.core import MQTTMS
+from mqttms import MQTTMS
 from smartfan.ms_host import MShost
 from smartfan.config import merge_cli_options
 from smartfan.logger_module import logger, string_handler

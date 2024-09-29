@@ -3,8 +3,7 @@
 import time
 import json
 import struct
-import mqttms
-from mqttms.ms_protocol import MSProtocol
+from  mqttms import MSProtocol
 from smartfan.logger_module import logger, string_handler
 
 class MShost:
