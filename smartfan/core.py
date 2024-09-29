@@ -11,12 +11,14 @@ from smartfan.logger_module import logger, string_handler
 def run_app(config: Dict):
     """Run the application with the given configuration."""
 
+    # create object
     try:
         mqttms = MQTTMS(config)
     except Exception as e:
         logger.error(f"Cannot create MQTTMS object. Giving up: {e}")
         return
 
+    # connect broker
     try:
         res = mqttms.connect_mqtt_broker()
         if not res:
@@ -27,6 +29,7 @@ def run_app(config: Dict):
         logger.error(f"Cannot connect to MQTT broker: {e}.")
         return
 
+    # subscribe
     try:
         res = mqttms.subscribe()
         if not res:
@@ -36,8 +39,10 @@ def run_app(config: Dict):
         logger.error(f"Cannot subscribe to MQTT broker: {e}")
         return
 
+    # create ms_host object if all above went well
     ms_host = MShost(ms_protocol=mqttms.ms_protocol,config=config)
 
+    # main loop of the program
     try:
         while True:
             # Simulate doing some work (replace this with actual logic)
