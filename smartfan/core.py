@@ -7,7 +7,7 @@ import mqttms
 from mqttms.mqtt_handler import MQTTHandler
 from mqttms.ms_protocol import MSProtocol
 from mqttms.mqtt_dispatcher import MQTTDispatcher
-from mqttms.core import graceful_exit
+from mqttms.core import MQTTMS
 from smartfan.ms_host import MShost
 from smartfan.config import merge_cli_options
 from smartfan.logger_module import logger, string_handler
@@ -15,45 +15,32 @@ from smartfan.logger_module import logger, string_handler
 def run_app(config: Dict):
     """Run the application with the given configuration."""
 
-    ms_protocol = None
-    mqtt_dispatcher = None
-    mqtt_handler = None
-
     try:
-        ms_protocol = MSProtocol(config=config)
-        mqtt_dispatcher = MQTTDispatcher(config=config, protocol=ms_protocol)
-        mqtt_handler = MQTTHandler(config=config,message_handler=mqtt_dispatcher)
-        ms_protocol.define_mqtt_handler(mqtt_handler)   # needed for publishing commands
+        mqttms = MQTTMS(config)
     except Exception as e:
-        logger.error(f"Cannot create MQTTHandler object: {e}")
-        if mqtt_handler:
-            mqtt_handler.exit_threads()
+        logger.error(f"Cannot create MQTTMS object. Giving up: {e}")
         return
 
-    # connect broker
     try:
-        res = mqtt_handler.connect()
+        res = mqttms.connect_mqtt_broker()
         if not res:
-            mqtt_handler.exit_threads()
+            mqttms.graceful_exit()
             return
     except Exception as e:
-        logger.error(f"Cannot connect to the MQTT broker: {e}")
-        graceful_exit(ms_protocol, mqtt_handler)
+        mqttms.graceful_exit()
+        logger.error(f"Cannot connect to MQTT broker: {e}.")
         return
 
-    # subscribe for MS protocol
     try:
-        res = ms_protocol.subscribe(ms_protocol.construct_rsp_topic())
+        res = mqttms.subscribe()
         if not res:
-            logger.warning(f"CORE: Not successful subscription. Giving up")
-            graceful_exit(ms_protocol,mqtt_handler)
+            logger.error(f"Cannot subscribe to MQTT broker.")
             return
     except Exception as e:
-        logger.error(f"Cannot subscribe to the MQTT broker: {e}")
-        graceful_exit(ms_protocol,mqtt_handler)
+        logger.error(f"Cannot subscribe to MQTT broker: {e}")
         return
 
-    ms_host = MShost(ms_protocol=ms_protocol,config=config)
+    ms_host = MShost(ms_protocol=mqttms.ms_protocol,config=config)
 
     try:
         while True:
@@ -100,7 +87,5 @@ def run_app(config: Dict):
             time.sleep(5)  # Sleep to avoid busy-waiting
     except KeyboardInterrupt:
         # Graceful exit on Ctrl-C
-        graceful_exit(ms_protocol,mqtt_handler)
-        #ms_protocol.queue_cmd.put((None, None))
-        #mqtt_handler.disconnect_and_exit()
+        mqttms.graceful_exit()
         logger.warning("Application stopped by user (Ctrl-C). Exiting...")
