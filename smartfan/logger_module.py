@@ -28,7 +28,7 @@ class StringHandler(logging.Handler):
         self.log_messages = []
 
 # Logger Setup
-logger = logging.getLogger("mq")
+logger = logging.getLogger("smartfan")
 logger.setLevel(logging.INFO)
 
 # Create the custom formatter and string handler

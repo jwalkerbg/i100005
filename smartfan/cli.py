@@ -1,6 +1,6 @@
 import argparse
+import logging
 import mqttms
-from mqttms import logger_module
 from mqttms import config
 
 from smartfan.core import run_app
@@ -36,6 +36,10 @@ def parse_args():
 
 def main():
     """Main entry point of the CLI."""
+
+    mqttms_logger = logging.getLogger('mqttms')
+    mqttms_logger.propagate = False
+    mqttms_logger.setLevel(logging.INFO)
 
     # Step 0: Log the beginning
     logger.info("mqttms beginning")
