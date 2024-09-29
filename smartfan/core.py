@@ -3,7 +3,7 @@
 import time
 import struct
 from typing import Dict
-from mqttms import MQTTMS
+from mqttms import MQTTms
 from smartfan.ms_host import MShost
 from smartfan.config import merge_cli_options
 from smartfan.logger_module import logger, string_handler
@@ -13,7 +13,7 @@ def run_app(config: Dict):
 
     # create object
     try:
-        mqttms = MQTTMS(config)
+        mqttms = MQTTms(config)
     except Exception as e:
         logger.error(f"Cannot create MQTTMS object. Giving up: {e}")
         return
