@@ -24,7 +24,7 @@ dependencies = [
     "paho-mqtt",
     "jsonschema",
     "rfc3986",
-    "mqttms"
+    "mqttms",
     "tomli; python_version < '3.11'"
 ]
 
@@ -54,7 +54,7 @@ where = ["src"]
 
 # Entry point for the CLI script
 [project.scripts]
-smartfan = "smartfan.cli.app:main"
+smartfan = "smartfan.cli:main"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
