@@ -1,6 +1,6 @@
 # core/core_module_a.py
 
-from pymodule.logger import getAppLogger
+from smartfan.logger import getAppLogger
 
 logger = getAppLogger(__name__)
 

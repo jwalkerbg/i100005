@@ -54,7 +54,7 @@ where = ["src"]
 
 # Entry point for the CLI script
 [project.scripts]
-pymodule = "smartfan.cli.app:main"
+smartfan = "smartfan.cli.app:main"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

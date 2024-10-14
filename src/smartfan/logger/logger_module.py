@@ -5,7 +5,7 @@ from typing import List
 import logging
 from datetime import datetime
 
-TAGNAME = "pymodule"
+TAGNAME = "smartfan"
 
 # Custom Formatter
 class CustomFormatter(logging.Formatter):

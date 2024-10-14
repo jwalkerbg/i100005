@@ -1,6 +1,6 @@
 # drivers/ina236.py
 
-from pymodule.logger import getAppLogger
+from smartfan.logger import getAppLogger
 
 logger = getAppLogger(__name__)
 
