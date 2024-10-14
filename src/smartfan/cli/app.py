@@ -1,5 +1,6 @@
 # src/cli/app.py
 import argparse
+import time
 
 from mqttms import MQTTms
 import smartfan.core.core_module_a
@@ -76,7 +77,7 @@ def run_app(config:Config) -> None:
         # create object
         try:
             logger.info(f"Try to create MQTTms with {config.config.get('mqttms',{})}")
-            mqttms = MQTTms(config.config['mqttms'])
+            mqttms = MQTTms(config.config['mqttms'],config.config['logging'])
         except Exception as e:
             logger.error(f"Cannot create MQTTMS object. Giving up: {e}")
             return
