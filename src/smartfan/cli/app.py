@@ -72,11 +72,11 @@ def main():
 def run_app(config:Config) -> None:
     try:
         logger.info("Running run_app")
-        logger.info(f"config = {config.config}")
+        if config.config.get('logging').get('verbose', False):
+            logger.info(f"config = {config.config}")
 
         # create object
         try:
-            logger.info(f"Try to create MQTTms with {config.config.get('mqttms',{})}")
             mqttms = MQTTms(config.config['mqttms'],config.config['logging'])
         except Exception as e:
             logger.error(f"Cannot create MQTTMS object. Giving up: {e}")
