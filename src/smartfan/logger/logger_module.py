@@ -1,8 +1,11 @@
 # logger.py
 
 # logger_module.py
+from typing import List
 import logging
 from datetime import datetime
+
+TAGNAME = "pymodule"
 
 # Custom Formatter
 class CustomFormatter(logging.Formatter):
@@ -27,19 +30,35 @@ class StringHandler(logging.Handler):
     def clear_logs(self):
         self.log_messages = []
 
-# Logger Setup
-logger = logging.getLogger("smartfan")
-logger.setLevel(logging.INFO)
-
 # Create the custom formatter and string handler
 custom_formatter = CustomFormatter()
+console_handler = logging.StreamHandler()
+console_handler.setFormatter(custom_formatter)
 string_handler = StringHandler()
 string_handler.setFormatter(custom_formatter)
 
-# Console handler (for immediate output)
-console_handler = logging.StreamHandler()
-console_handler.setFormatter(custom_formatter)
+def getAppLogger(area_tag:str, toString:bool=False) -> logging.Logger:
+    if not area_tag or len(area_tag) == 0:
+        return None
+    lg = logging.getLogger(area_tag)
+    lg.setLevel(logging.INFO)
+    lg.addHandler(console_handler)
+    if toString:
+        lg.addHandler(string_handler)
 
-# Add handlers to the logger
-logger.addHandler(console_handler)
-# logger.addHandler(string_handler)
+    return lg
+
+def addStringHandler(lg:logging.Logger) -> None:
+    lg.addHandler(string_handler)
+
+def disableStringHandler() -> None:
+    string_handler.addFilter(lambda record: False)
+
+def enableStringHandler() -> None:
+    string_handler.filters.clear()
+
+def getStringLogs() -> List[str]:
+    return string_handler.get_logs()
+
+def clearStringLogs() -> None:
+    string_handler.clear_logs()
