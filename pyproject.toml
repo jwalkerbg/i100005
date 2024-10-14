@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "smartfan"
-version = "0.1.0"
+version = "0.2.0"
 description = "CLI for working with smart fans"
 readme = { text = """This is a multi-line basic string.
 It allows for special characters such as \n for newlines and " for quotes.""", content-type = "text/plain" }
