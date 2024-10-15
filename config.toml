@@ -1,0 +1,18 @@
+[mqttms.mqtt]
+host = "broker.emqx.io"
+port = 1883
+username = ""
+password = ""
+client_id = "client_394578"
+timeout = 30.0
+long_payload = 25
+
+[mqttms.ms]
+client_mac = "1234567890A1"
+server_mac = "F412FACEF2E8"
+cmd_topic = "@/server_mac/CMD/format"
+rsp_topic = "@/client_mac/RSP/format"
+timeout = 5.0
+
+[logging]
+verbose = false
