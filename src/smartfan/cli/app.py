@@ -152,15 +152,6 @@ def run_app(config:Config) -> None:
             mqttms.graceful_exit()
             logger.warning("Application stopped by user (Ctrl-C). Exiting...")
 
-############################
-        # smartfan.core.core_module_a.hello_from_core_module_a()
-        # smartfan.core.core_module_a.goodbye_from_core_module_a()
-        # smartfan.core.core_module_b.hello_from_core_module_b()
-        # smartfan.core.core_module_b.goodbye_from_core_module_b()
-        # smartfan.utils.hello_from_utils()
-        # smartfan.drivers.hello_from_ina236()
-############################
-
     finally:
         logger.info("Exiting run_app")
 
