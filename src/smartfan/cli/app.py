@@ -3,10 +3,7 @@ import argparse
 import time
 
 from mqttms import MQTTms
-import smartfan.core.core_module_a
-import smartfan.core.core_module_b
 import smartfan.utils.utilities
-import smartfan.drivers.ina236
 from smartfan.core.config import Config
 from smartfan.logger import getAppLogger
 from smartfan.core.ms_host import MShost
