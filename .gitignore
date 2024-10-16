@@ -1,4 +1,4 @@
-/src/smartfan/__pycache__
-/tests/__pycache__
+__pycache__/
 /src/smartfan.egg-info
 /dist
+.coverage

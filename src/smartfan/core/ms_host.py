@@ -4,7 +4,9 @@ import time
 import json
 import struct
 from  mqttms import MSProtocol
-from smartfan.logger_module import logger, string_handler
+from smartfan.logger import getAppLogger
+
+logger = getAppLogger(__name__)
 
 class MShost:
     def __init__(self, ms_protocol: MSProtocol, config):
