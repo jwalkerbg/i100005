@@ -24,11 +24,14 @@ class Config:
     DEFAULT_CONFIG = {
         'template': {
             'template_name': "pymodule",
-            'template_version': "0.3.0",
+            'template_version': "0.5.0",
             'template_description': { 'text': """Template with CLI interface, configuration options in a file, logger and unit tests""", 'content-type': "text/plain" }
         },
+        'metadata': {
+            'version': False
+        },
         'logging': {
-            'verbose': True
+            'verbose': False
         },
         'mqttms': {
             'mqtt': {
@@ -55,6 +58,15 @@ class Config:
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
+            "metadata": {
+                "type": "object",
+                "properties": {
+                    "version": {
+                        "type": "boolean"
+                    }
+                },
+                "additionalProperties": False
+            },
             "logging": {
                 "type": "object",
                 "properties": {
@@ -172,7 +184,6 @@ class Config:
 
     def merge_options(self, config_file:Dict, config_cli:argparse.Namespace=None) -> Dict:
         # handle CLI options if started from CLI interface
-        # replace param1 and para2 with actual parameters, defined in app:parse_args()
 
         # Handle MQTT CLI overrides
         if config_cli:
@@ -203,8 +214,10 @@ class Config:
             if config_cli.ms_timeout:
                 self.config['mqttms']['ms']['timeout'] = config_cli.ms_timeout
 
+            if config_cli.app_version:
+                self.config['metadata']['version'] = True
             # Handle general options
-            if config_cli.verbose is not None:
+            if config_cli.verbose:
                 self.config['logging']['verbose'] = config_cli.verbose
 
         return self.config
