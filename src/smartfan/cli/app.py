@@ -2,14 +2,25 @@
 import argparse
 import time
 from importlib.metadata import version
+from typing import Dict, Tuple
 
-from mqttms import MQTTms
+from mqttms import MQTTms, MQTTDispatcher
 import smartfan.utils.utilities
 from smartfan.core.config import Config
 from smartfan.logger import getAppLogger
 from smartfan.core.ms_host import MShost
 
 logger = getAppLogger(__name__)
+
+class AppMQTTDispatcher(MQTTDispatcher):
+    def __init__(self, config: Dict):
+        super().__init__(config)
+
+    def handle_message(self, message: Tuple[str, str]) -> bool:
+        if not super().handle_message(message):
+            logger.info(f"handle_message: -t '{message[0]}' -m '{message[1]}'")
+            return True
+        return False
 
 def parse_args():
     """Parse command-line arguments, including nested options for mqtt and MS Protocol."""
@@ -80,9 +91,12 @@ def run_app(config:Config) -> None:
             if config.config.get('logging').get('verbose', False):
                 logger.info(f"config = {config.config}")
 
+            # create AppMQTTDispatcher object
+            appdipatcher = AppMQTTDispatcher(config.config)
+
             # create object
             try:
-                mqttms = MQTTms(config.config['mqttms'],config.config['logging'])
+                mqttms = MQTTms(config.config['mqttms'],config.config['logging'],appdipatcher)
             except Exception as e:
                 logger.error(f"Cannot create MQTTMS object. Giving up: {e}")
                 return
@@ -100,6 +114,7 @@ def run_app(config:Config) -> None:
 
             # subscribe
             try:
+                ras = mqttms.subscribe("/Artifical/topic/to/see/if/it/works")
                 res = mqttms.subscribe()
                 if not res:
                     logger.error(f"Cannot subscribe to MQTT broker.")
@@ -127,6 +142,7 @@ def run_app(config:Config) -> None:
 
                     payload = ms_host.ms_who_am_i()
 
+                    mqttms.publish("/Artifical/topic/to/see/if/it/works", '{"key":"value"}')
                     payload = ms_host.ms_version()
                     if payload.get("response","") == "OK":
                         jdata = payload.get('data', None)
