@@ -2,28 +2,28 @@ import pytest
 import tomllib
 import argparse
 from unittest.mock import patch, mock_open, MagicMock
-import pymodule
-from pymodule import core
+import smartfan
+from smartfan import core
 #from core import config
 #from config import Config
-#from pymodule.logger import getAppLogger
+#from smartfan.logger import getAppLogger
 
 class TestConfig:
 
     @pytest.fixture
     def config_instance(self):
         """Fixture to create a fresh instance of Config."""
-        return pymodule.core.Config()
+        return smartfan.core.Config()
 
     def test_default_config(self, config_instance):
         """
         Test that the default configuration is correctly initialized.
         """
-        expected_config = pymodule.core.Config.DEFAULT_CONFIG
+        expected_config = smartfan.core.Config.DEFAULT_CONFIG
         assert config_instance.config == expected_config
 
-    @patch('pymodule.core.config.open', new_callable=mock_open, read_data=b'{"parameters": {"param1": 10}}')
-    @patch('pymodule.core.config.tomllib.load')
+    @patch('smartfan.core.config.open', new_callable=mock_open, read_data=b'{"parameters": {"param1": 10}}')
+    @patch('smartfan.core.config.tomllib.load')
     def test_load_toml_success(self, mock_tomli_load, mock_open, config_instance):
         """
         Test that a valid TOML file is loaded correctly.
@@ -34,25 +34,25 @@ class TestConfig:
         mock_open.assert_called_once_with("config.toml", 'rb')
         mock_tomli_load.assert_called_once()
 
-    @patch('pymodule.core.config.open', side_effect=FileNotFoundError)
+    @patch('smartfan.core.config.open', side_effect=FileNotFoundError)
     def test_load_toml_file_not_found(self, mock_open, config_instance):
         """
         Test that FileNotFoundError is raised and logged when the TOML file is not found.
         """
-        with patch('pymodule.core.config.logger') as mock_logger:
+        with patch('smartfan.core.config.logger') as mock_logger:
             with pytest.raises(FileNotFoundError):
                 config_instance.load_toml("missing.toml")
             mock_logger.error.assert_called_once()
 
     def test_load_config_file_invalid_syntax(self, config_instance):
         # Mock the open and tomllib.load to simulate invalid TOML syntax
-        with patch('pymodule.core.config.open', new_callable=mock_open, read_data=b'invalid_toml_data'):
-            with patch('pymodule.core.config.tomllib.load', side_effect=tomllib.TOMLDecodeError("Invalid TOML", "", 0)):
+        with patch('smartfan.core.config.open', new_callable=mock_open, read_data=b'invalid_toml_data'):
+            with patch('smartfan.core.config.tomllib.load', side_effect=tomllib.TOMLDecodeError("Invalid TOML", "", 0)):
                 # Use pytest.raises to check if the appropriate exception is raised
                 with pytest.raises(tomllib.TOMLDecodeError):
                     config_instance.load_config_file(file_path='invalid_config.toml')
 
-    @patch.object(pymodule.core.Config, 'load_toml', return_value={"parameters": {"param1": 10}})
+    @patch.object(smartfan.core.Config, 'load_toml', return_value={"parameters": {"param1": 10}})
     def test_load_config_file(self, mock_load_toml, config_instance):
         """
         Test that the config file is loaded and deep_update is called.
@@ -74,7 +74,7 @@ class TestConfig:
         """
         Test that the default 'config.toml' is used if None is passed.
         """
-        with patch('pymodule.core.config.logger') as mock_logger:
+        with patch('smartfan.core.config.logger') as mock_logger:
             with patch.object(core.Config, 'load_toml', return_value={"logging": {"verbose": False}}) as mock_load_toml:
                 config_instance.load_config_file(None)
                 mock_logger.error.assert_called_once_with("CFG: Using default 'None'")
@@ -128,14 +128,16 @@ class TestConfig:
         cli_args = argparse.Namespace(param1=10, param2=20, verbose=False)
         config_file = {
             'parameters': {'param1': 1, 'param2': 2},
-            'logging': {'verbose': True}
+            'logging': {'verbose': True},
+            'metadata': { 'version': False }
         }
         config_instance.config = config_file  # Simulate loaded config
         merged_config = config_instance.merge_options(config_file, cli_args)
 
         expected_config = {
             'parameters': {'param1': 10, 'param2': 20},  # CLI args should override
-            'logging': {'verbose': False}  # CLI arg should override
+            'logging': {'verbose': False},  # CLI arg should override
+            'metadata': { 'version': False }
         }
         assert merged_config == expected_config
 
@@ -145,13 +147,15 @@ class TestConfig:
         """
         config_file = {
             'parameters': {'param1': 1, 'param2': 2},
-            'logging': {'verbose': True}
+            'logging': {'verbose': True},
+            'metadata': { 'version': False }
         }
         config_instance.config = config_file  # Simulate loaded config
         merged_config = config_instance.merge_options(config_file, None)
 
         expected_config = {
             'parameters': {'param1': 1, 'param2': 2},
-            'logging': {'verbose': True}
+            'logging': {'verbose': True},
+            'metadata': { 'version': False }
         }
         assert merged_config == expected_config  # No changes without CLI args

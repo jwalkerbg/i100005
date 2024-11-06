@@ -3,7 +3,7 @@
 import unittest
 import pytest   # needed for pytest decorators
 
-from pymodule import utils
+from smartfan import utils
 
 # unittest style
 class TestUtils(unittest.TestCase):
