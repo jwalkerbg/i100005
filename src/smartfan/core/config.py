@@ -214,10 +214,10 @@ class Config:
             if config_cli.ms_timeout:
                 self.config['mqttms']['ms']['timeout'] = config_cli.ms_timeout
 
-            if config_cli.app_version:
-                self.config['metadata']['version'] = True
+            if config_cli.app_version is not None:
+                self.config['metadata']['version'] = config_cli.app_version
             # Handle general options
-            if config_cli.verbose:
+            if config_cli.verbose is not None:
                 self.config['logging']['verbose'] = config_cli.verbose
 
         return self.config
