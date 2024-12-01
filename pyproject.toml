@@ -58,4 +58,4 @@ smartfan = "smartfan.cli.app:main"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = "src"
+pythonpath = "./src"
