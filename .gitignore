@@ -2,3 +2,4 @@ __pycache__/
 /src/smartfan.egg-info
 /dist
 .coverage
+build

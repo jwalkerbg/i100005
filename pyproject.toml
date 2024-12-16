@@ -1,61 +1,61 @@
-[build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
-
-[project]
+[tool.poetry]
 name = "smartfan"
-version = "1.0.3"
+version = "2.0.1"
 description = "CLI for working with smart fans"
-readme = { text = """This is a multi-line basic string.
-It allows for special characters such as \n for newlines and " for quotes.""", content-type = "text/plain" }
-requires-python = ">=3.6"
-
-# Author information using a literal single-quoted email and basic double-quoted name
-authors = [
-    { name = "Ivan Cenov", email = "i_cenov@botevgrad.com" }
-]
-maintainers = [
-    { name = "Ivan Cenov", email = "i_cenov@botevgrad.com" }
+readme = "README.md"
+authors = ["Ivan Cenov <i_cenov@botevgrad.com>"]
+packages = [{include = "smartfan", from = "src"}]
+include = [
+    "pyproject.toml",
+    "build.py",
+    "README.md"
 ]
 
-# Dependencies
-dependencies = [
-    "numpy",
-    "paho-mqtt",
-    "jsonschema",
-    "rfc3986",
-    "mqttms",
-    "tomli; python_version < '3.11'"
-]
+# Runtime dependencies
+[tool.poetry.dependencies]
+python = ">=3.12"
+cython = ">=3.0"
+setuptools = ">=68.0.0"
+tomli = { version = "*", markers = "python_version < '3.11'" }
+numpy = "*"
+importlib = "*"
+paho-mqtt = "*"
+jsonschema = "*"
+types-jsonschema = "*"
+rfc3986 = "*"
+mqttms = {path = "../../100004/i100004"}
 
-# Optional dependencies section for development tools
-[project.optional-dependencies]
-dev = [
-    "pytest>=8.0.0"
-]
+# Development dependencies
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.5.1"  # Static type checker
+pathlib = ">=1.0"
+build = "^1.2.2.post1"
 
-# Defining various URLs (these UTL are examples, please add other urls and/or remove redundant ones.
-[project.urls]
-homepage = "https://smartfan.example.com"  # Literal string for homepage URL
-repository = "http://github.com/username/smartfan.git"  # Basic string for repository URL
-documentation = "https://smartfan.readthedocs.io"
-bug_tracker = "https://github.com/username/smartfan/issues"
-changelog = "https://github.com/username/smartfan/releases"
-ci_pipeline = "https://github.com/username/smartfan/actions"
-funding = "https://github.com/sponsors/username"
-faq = "https://smartfan.example.com/faq"  # Custom URL key for FAQ
+# Test dependencies
+[tool.poetry.group.test.dependencies]
+pytest = ">=8.0.0"
+pytest-cov = ">=6.0.0"
+pytest-mock = ">=3.0.0"
 
-# Example custom configuration for `setuptools`
-[tool.setuptools]
-package-dir = {"" = "src"}  # Single-quoted key for directory name
-
-[tool.setuptools.packages.find]
-where = ["src"]
-
-# Entry point for the CLI script
-[project.scripts]
+# CLI entry points
+[tool.poetry.scripts]
 smartfan = "smartfan.cli.app:main"
+
+# Definitions, specific for this project.
+[tool.build.config]
+extensions_path = "src/extensions"
+include_dirs = ["src/include"]
+libraries = []
+build_log = true
+
+[build-system]
+requires = ["poetry-core", "setuptools", "Cython", "build"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.build]
+generate-setup-file = true
+script = 'build.py'
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-
+pythonpath = "src"
