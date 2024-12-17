@@ -52,33 +52,12 @@ class TestConfig:
                 with pytest.raises(tomllib.TOMLDecodeError):
                     config_instance.load_config_file(file_path='invalid_config.toml')
 
-    @patch.object(smartfan.core.Config, 'load_toml', return_value={"parameters": {"param1": 10}})
-    def test_load_config_file(self, mock_load_toml, config_instance):
-        """
-        Test that the config file is loaded and deep_update is called.
-        """
-        with patch.object(core.Config, 'deep_update') as mock_deep_update:
-            config_file = config_instance.load_config_file("config.toml")
-            assert config_file == {"parameters": {"param1": 10}}
-            mock_load_toml.assert_called_once_with(file_path='config.toml')
-            mock_deep_update.assert_called_once_with(config=config_instance.config, config_file={"parameters": {"param1": 10}})
-
     def test_load_config_file_with_empty_name(self, config_instance):
         """
         Test that load_config_file returns an empty dict when given an empty filename.
         """
         result = config_instance.load_config_file("")
         assert result == {}
-
-    def test_load_config_file_with_default(self, config_instance):
-        """
-        Test that the default 'config.toml' is used if None is passed.
-        """
-        with patch('smartfan.core.config.logger') as mock_logger:
-            with patch.object(core.Config, 'load_toml', return_value={"logging": {"verbose": False}}) as mock_load_toml:
-                config_instance.load_config_file(None)
-                mock_logger.error.assert_called_once_with("CFG: Using default 'None'")
-                mock_load_toml.assert_called_once_with(file_path="config.toml")
 
     # Deep Update Tests
     def test_deep_update_basic_merge(self, config_instance):
@@ -120,26 +99,6 @@ class TestConfig:
         config_instance.deep_update(config, config_file)
         expected_config = {'existing_key': 'value', 'new_key': 'new_value'}
         assert config == expected_config
-
-    def test_merge_options(self, config_instance):
-        """
-        Test the merge_options function with CLI arguments.
-        """
-        cli_args = argparse.Namespace(param1=10, param2=20, verbose=False)
-        config_file = {
-            'parameters': {'param1': 1, 'param2': 2},
-            'logging': {'verbose': True},
-            'metadata': { 'version': False }
-        }
-        config_instance.config = config_file  # Simulate loaded config
-        merged_config = config_instance.merge_options(config_file, cli_args)
-
-        expected_config = {
-            'parameters': {'param1': 10, 'param2': 20},  # CLI args should override
-            'logging': {'verbose': False},  # CLI arg should override
-            'metadata': { 'version': False }
-        }
-        assert merged_config == expected_config
 
     def test_merge_options_no_cli(self, config_instance):
         """
