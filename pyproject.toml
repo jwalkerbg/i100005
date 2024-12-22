@@ -17,12 +17,13 @@ python = ">=3.12"
 cython = ">=3.0"
 setuptools = ">=68.0.0"
 tomli = { version = "*", markers = "python_version < '3.11'" }
-numpy = "*"
+numpy = "2.2.0"
 importlib = "*"
 paho-mqtt = "*"
 jsonschema = "*"
 types-jsonschema = "*"
 rfc3986 = "*"
+typer = "*"
 mqttms = {path = "../../100004/i100004"}
 
 # Development dependencies
