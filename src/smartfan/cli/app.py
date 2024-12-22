@@ -1,6 +1,7 @@
 # src/cli/app.py
 import argparse
 import time
+import struct
 from importlib.metadata import version
 from typing import Dict, Tuple
 
@@ -130,15 +131,16 @@ def run_app(config:Config) -> None:
         try:
             while True:
                 # Simulate doing some work (replace this with actual logic)
-                # payload = ms_host.ms_sensors()
-                # if payload.get("response","") == "OK":
-                #     jdata = payload.get('data', None)
-                #     format_string = '<hIIIHBBB'
-                #     bdata = bytes.fromhex(jdata)
-                #     unpacked_data = struct.unpack(format_string, bdata)
-                #     logger.info(f"MSH unpacked_data = {unpacked_data}")
-                # else:
-                #     logger.info("MSH: No valid data received")
+                payload = ms_host.ms_sensors()
+                if payload.get("response","") == "OK":
+                    jdata = payload.get('data', None)
+                    format_string = '<hIIIHBBB'
+                    bdata = bytes.fromhex(jdata)
+                    unpacked_data = struct.unpack(format_string, bdata)
+                    logger.info(f"MSH unpacked_data = {unpacked_data} C")
+                    logger.info(f"\nTemperature: {unpacked_data[0]/100}\nPressure: {unpacked_data[1]/100} hPa\nHumidity: {unpacked_data[2]/1000} %\nGas:{unpacked_data[3]} Ohm\nAmbient light: {unpacked_data[4]}\nSensors: {unpacked_data[5]:x}\nMotor: {unpacked_data[6]:x}\nDevice state: {unpacked_data[7]:x}")
+                else:
+                    logger.info("MSH: No valid data received")
 
                 payload = ms_host.ms_who_am_i()
 
@@ -170,7 +172,7 @@ def run_app(config:Config) -> None:
                 # payload = ms_host.ms_set_forced_time(25)
                 # payload = ms_host.ms_set_forced_time(61)
 
-                time.sleep(5)  # Sleep to avoid busy-waiting
+                time.sleep(120)  # Sleep to avoid busy-waiting
         except KeyboardInterrupt:
             # Graceful exit on Ctrl-C
             mqttms.graceful_exit()
