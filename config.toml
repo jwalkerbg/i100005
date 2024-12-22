@@ -9,7 +9,7 @@ long_payload = 25
 
 [mqttms.ms]
 client_mac = "1234567890A1"
-server_mac = "F412FACEF2E8"
+server_mac = "F412FAD56AF4"     # ESP32 module: "F412FACEF2E8"
 cmd_topic = "@/server_mac/CMD/format"
 rsp_topic = "@/client_mac/RSP/format"
 timeout = 5.0
