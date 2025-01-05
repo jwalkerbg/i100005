@@ -31,6 +31,7 @@ mqttms = {path = "../../100004/i100004"}
 mypy = "^1.5.1"  # Static type checker
 pathlib = ">=1.0"
 build = "^1.2.2.post1"
+pylint = "^3.3.3"
 
 # Test dependencies
 [tool.poetry.group.test.dependencies]
