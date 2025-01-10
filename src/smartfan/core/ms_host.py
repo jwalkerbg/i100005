@@ -35,6 +35,18 @@ class MShost:
         self.ms_protocol.response_received.clear()
         return payload
 
+    def ms_command_send_uint8(self, cmd: str, value: int):
+        format_string = '<B'
+        pd = struct.pack(format_string,value).hex()
+        payload = f'{{"command":"{cmd}","data":"{pd}"}}'
+        self.ms_protocol.put_command(payload)
+
+        self.ms_protocol.response_received.wait()
+        payload = self.ms_protocol.response
+        logger.info(f"MSH response: {payload}")
+        self.ms_protocol.response_received.clear()
+        return payload
+
     def ms_who_am_i(self):
         return self.ms_simple_command("WH")
 
@@ -120,3 +132,12 @@ class MShost:
         logger.info(f"MSH response: {payload}")
         self.ms_protocol.response_received.clear()
         return payload
+
+    def ms_getmachid(self):
+        return self.ms_simple_command("ZA")
+
+    def ms_motor(self, mode:int):
+        return self.ms_command_send_uint8("MT",mode)
+
+    def ms_testmode(self):
+        return self.ms_simple_command("TM")
