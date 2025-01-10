@@ -1,7 +1,5 @@
 # ms_host.py
 
-import time
-import json
 import struct
 from  mqttms import MSProtocol
 from smartfan.logger import getAppLogger
