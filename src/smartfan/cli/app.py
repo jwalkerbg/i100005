@@ -10,6 +10,7 @@ import smartfan.utils.utilities
 from smartfan.core.config import Config
 from smartfan.logger import getAppLogger
 from smartfan.core.ms_host import MShost
+from smartfan.testbench import TestBench
 
 logger = getAppLogger(__name__)
 
@@ -87,11 +88,27 @@ def main():
 
 # CLI application main function with collected options & configuration
 def run_app(config:Config) -> None:
+
+    print(f"config = {config.config}")
+
     try:
         logger.info("Running run_app")
         if config.config.get('logging').get('verbose', False):
             logger.info(f"config = {config.config}")
 
+        # Create testBench object
+        tb = TestBench(config.config)
+
+        # Step 1) BLE binding, exchange WIFi credentials / MAC address
+        if not tb.ble_binding():
+            logger.error("Cannot bind with server via BLE")
+            return
+
+        # At this point:
+        # Rhe server knows WiFi credentials and connects to MQTT broker
+        # the client (this app) knows MAC address of the server
+
+        # Step 2) Connect to MQTT broker and send API_MQQT_READY command
         # create AppMQTTDispatcher object
         appdipatcher = AppMQTTDispatcher(config.config)
 
@@ -115,7 +132,6 @@ def run_app(config:Config) -> None:
 
         # subscribe
         try:
-            ras = mqttms.subscribe("/Artifical/topic/to/see/if/it/works")
             res = mqttms.subscribe()
             if not res:
                 logger.error(f"Cannot subscribe to MQTT broker.")
@@ -127,58 +143,35 @@ def run_app(config:Config) -> None:
         # create ms_host object if all above went well
         ms_host = MShost(ms_protocol=mqttms.ms_protocol,config=config)
 
-        # main loop of the program
-        try:
-            while True:
-                # Simulate doing some work (replace this with actual logic)
-                payload = ms_host.ms_sensors()
-                if payload.get("response","") == "OK":
-                    jdata = payload.get('data', None)
-                    format_string = '<hIIIHBBB'
-                    bdata = bytes.fromhex(jdata)
-                    unpacked_data = struct.unpack(format_string, bdata)
-                    logger.info(f"MSH unpacked_data = {unpacked_data} C")
-                    logger.info(f"\nTemperature: {unpacked_data[0]/100}\nPressure: {unpacked_data[1]/100} hPa\nHumidity: {unpacked_data[2]/1000} %\nGas:{unpacked_data[3]} Ohm\nAmbient light: {unpacked_data[4]}\nSensors: {unpacked_data[5]:x}\nMotor: {unpacked_data[6]:x}\nDevice state: {unpacked_data[7]:x}")
-                else:
-                    logger.info("MSH: No valid data received")
+        # Wait for a while to give the server chance to connecet to WhiFI and MQTT broker
+        time.sleep(0.5)
 
-                payload = ms_host.ms_who_am_i()
+        payload = ms_host.ms_mqtt_ready()
+        resp = payload.get("response","")
+        if resp != "OK":
+            logger.error("API_MQTT_READy received answer: {resp}")
+            return
 
-                mqttms.publish("/Artifical/topic/to/see/if/it/works", '{"key":"value"}')
-                payload = ms_host.ms_version()
-                if payload.get("response","") == "OK":
-                    jdata = payload.get('data', None)
-                    byte_array = bytes.fromhex(jdata)
-                    version_bytes, serial_bytes = byte_array.split(b'\0',1)
-                    versiondev = version_bytes.decode('ascii')
-                    serial = serial_bytes.decode('ascii').rstrip('\x00')
-                    logger.info(f"Version: {versiondev}")
-                    logger.info(f"Serial Number: {serial}")
+        payload = ms_host.ms_who_am_i()
 
-                # payload = ms_host.ms_serial("2407-0002")
+        payload = ms_host.ms_version()
+        if payload.get("response","") == "OK":
+            jdata = payload.get('data', None)
+            byte_array = bytes.fromhex(jdata)
+            version_bytes, serial_bytes = byte_array.split(b'\0',1)
+            versiondev = version_bytes.decode('ascii')
+            serial = serial_bytes.decode('ascii').rstrip('\x00')
+            logger.info(f"Version: {versiondev}")
+            logger.info(f"Serial Number: {serial}")
 
-                # payload = ms_host.ms_wificred("iv_cenov", "6677890vla")
+        tb.tests()
 
-                # payload = ms_host.ms_get_params()
-
-                # payload = ms_host.ms_set_mode(0)
-                # payload = ms_host.ms_set_amb_thr(1024)
-                # payload = ms_host.ms_set_hum_thr(75)
-                # payload = ms_host.ms_set_hum_thr(100)
-
-                # payload = ms_host.ms_set_gas_thr(16000)
-                # payload = ms_host.ms_set_gas_thr(50000)
-
-                # payload = ms_host.ms_set_forced_time(25)
-                # payload = ms_host.ms_set_forced_time(61)
-
-                time.sleep(120)  # Sleep to avoid busy-waiting
-        except KeyboardInterrupt:
-            # Graceful exit on Ctrl-C
-            mqttms.graceful_exit()
-            logger.warning("Application stopped by user (Ctrl-C). Exiting...")
+    except KeyboardInterrupt:
+        logger.warning("Application stopped by user (Ctrl-C). Exiting...")
 
     finally:
+        # Graceful exit on Ctrl-C
+        mqttms.graceful_exit()
         logger.info("Exiting run_app")
 
 if __name__ == "__main__":
