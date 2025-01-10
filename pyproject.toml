@@ -61,3 +61,7 @@ script = 'build.py'
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = "src"
+
+[tool.pylint]
+disable = "missing-docstring"
+max-line-length = 200
