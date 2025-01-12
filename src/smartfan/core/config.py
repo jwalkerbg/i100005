@@ -50,6 +50,9 @@ class Config:
                 'rsp_topic': '@/client_mac/RSP/format',
                 'timeout': 5.0
             }
+        },
+        "tests": {
+
         }
     }
 
@@ -106,9 +109,12 @@ class Config:
                 },
                 "required": ["mqtt", "ms"],
                 "additionalProperties": False
+            },
+            "tests": {
+                "type": "object"
             }
         },
-        "required": ["logging", "mqttms"],
+        "required": ["logging", "mqttms", "tests"],
         "additionalProperties": False
     }
 

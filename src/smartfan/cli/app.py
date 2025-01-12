@@ -105,7 +105,7 @@ def run_app(config:Config) -> None:
             return
 
         # At this point:
-        # Rhe server knows WiFi credentials and connects to MQTT broker
+        # Тhe server knows WiFi credentials and connects to MQTT broker
         # the client (this app) knows MAC address of the server
 
         # Step 2) Connect to MQTT broker and send API_MQQT_READY command
@@ -130,39 +130,13 @@ def run_app(config:Config) -> None:
             logger.error(f"Cannot connect to MQTT broker: {e}.")
             return
 
-        # subscribe
-        try:
-            res = mqttms.subscribe()
-            if not res:
-                logger.error(f"Cannot subscribe to MQTT broker.")
-                return
-        except Exception as e:
-            logger.error(f"Cannot subscribe to MQTT broker: {e}")
-            return
-
         # create ms_host object if all above went well
         ms_host = MShost(ms_protocol=mqttms.ms_protocol,config=config)
 
+        tb.set_ms_mqtt(ms_host=ms_host,mqttms=mqttms)
+
         # Wait for a while to give the server chance to connecet to WhiFI and MQTT broker
         time.sleep(0.5)
-
-        payload = ms_host.ms_mqtt_ready()
-        resp = payload.get("response","")
-        if resp != "OK":
-            logger.error("API_MQTT_READy received answer: {resp}")
-            return
-
-        payload = ms_host.ms_who_am_i()
-
-        payload = ms_host.ms_version()
-        if payload.get("response","") == "OK":
-            jdata = payload.get('data', None)
-            byte_array = bytes.fromhex(jdata)
-            version_bytes, serial_bytes = byte_array.split(b'\0',1)
-            versiondev = version_bytes.decode('ascii')
-            serial = serial_bytes.decode('ascii').rstrip('\x00')
-            logger.info(f"Version: {versiondev}")
-            logger.info(f"Serial Number: {serial}")
 
         tb.tests()
 
