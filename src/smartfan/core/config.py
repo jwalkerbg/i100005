@@ -3,9 +3,7 @@
 import sys
 from typing import Dict, Any
 import argparse
-import json
 from jsonschema import validate, ValidationError
-import importlib.resources as resources
 
 from smartfan.logger import getAppLogger
 
@@ -188,7 +186,7 @@ class Config:
                 # Otherwise, update the key with the new value from config_file
                 config[key] = value
 
-    def merge_options(self, config_file:Dict, config_cli:argparse.Namespace=None) -> Dict:
+    def merge_options(self, config_cli:argparse.Namespace=None) -> Dict:
         # handle CLI options if started from CLI interface
 
         # Handle MQTT CLI overrides
@@ -230,25 +228,24 @@ class Config:
 
     def log_configuration(self):
         logger.info("Running in verbose mode.")
-        logger.info(f"Final Configuration: {self.config}")
 
         # MQTT configuration
         mqtt_config = self.config['mqttms']['mqtt']
-        logger.info(f"MQTT Configuration:")
-        logger.info(f"  Host: {mqtt_config['host']}")
-        logger.info(f"  Port: {mqtt_config['port']}")
-        logger.info(f"  Username: {mqtt_config.get('username', 'N/A')}")
-        logger.info(f"  Password: {mqtt_config.get('password', 'N/A')}")
-        logger.info(f"  Client ID: {mqtt_config.get('client_id', 'N/A')}")
-        logger.info(f"  Timeout: {mqtt_config.get('timeout', 'N/A')}")
-        logger.info(f"  Long payloads threshold: {mqtt_config.get('long_payload', 'N/A')}")
+        logger.info("MQTT Configuration:")
+        logger.info("  Host: %s",mqtt_config['host'])
+        logger.info("  Port: %d",mqtt_config['port'])
+        logger.info("  Username: %s",mqtt_config.get('username', 'N/A'))
+        logger.info("  Password: %s",mqtt_config.get('password', 'N/A'))
+        logger.info("  Client ID: %s",mqtt_config.get('client_id', 'N/A'))
+        logger.info("  Timeout: %d",mqtt_config.get('timeout', 'N/A'))
+        logger.info("  Long payloads threshold: %d",mqtt_config.get('long_payload', 'N/A'))
 
         ms_config = self.config['mqttms']['ms']
-        logger.info(f"MS Configuration")
-        logger.info(f"  Client (master) MAC: {ms_config.get('client_mac', 'N/A')}")
-        logger.info(f"  Server (slave) MAC:  {ms_config.get('server_mac', 'N/A')}")
-        logger.info(f"  Command topic:  {ms_config.get('cmd_topic', 'N/A')}")
-        logger.info(f"  Response topic: {ms_config.get('rsp_topic', 'N/A')}")
-        logger.info(f"  MS protocol timeout: {ms_config.get('timeout', 'N/A')}")
+        logger.info("MS Configuration")
+        logger.info("  Client (master) MAC: %s",ms_config.get('client_mac', 'N/A'))
+        logger.info("  Server (slave) MAC:  %s",ms_config.get('server_mac', 'N/A'))
+        logger.info("  Command topic:  %s",ms_config.get('cmd_topic', 'N/A'))
+        logger.info("  Response topic: %s",ms_config.get('rsp_topic', 'N/A'))
+        logger.info("  MS protocol timeout: %f",ms_config.get('timeout', 'N/A'))
 
         logger.info("Application started with the above configuration...")

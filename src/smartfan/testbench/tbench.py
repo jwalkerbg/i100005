@@ -2,17 +2,14 @@
 
 import time
 import struct
-
-from mqttms import MQTTms
+import re
+from prompt_toolkit import prompt
+from prompt_toolkit.validation import Validator, ValidationError
 
 from smartfan.logger import getAppLogger
 from smartfan.core import MShost
 
 logger = getAppLogger(__name__)
-
-from prompt_toolkit import prompt
-from prompt_toolkit.validation import Validator, ValidationError
-import re
 
 class MACAddressValidator(Validator):
     def validate(self, document):
@@ -63,7 +60,7 @@ class TestBench:
         try:
             res = self.ms_host.ms_protocol.subscribe()
             if not res:
-                logger.error(f"Cannot subscribe to MQTT broker.")
+                logger.error("Cannot subscribe to MQTT broker: %d",res)
                 return
         except Exception as e:
             logger.error(f"Cannot subscribe to MQTT broker: {e}")
@@ -85,7 +82,7 @@ class TestBench:
 
         for test in self.tests:
             logger.info("")
-            logger.info(f"**** Test {test[1]} ****")
+            logger.info("**** Test %s ****",{test[1]})
             test[0]()
 
     def t_who_am_i(self):
@@ -95,7 +92,7 @@ class TestBench:
             format_string = '<B'
             bdata = bytes.fromhex(jdata)
             unpacked_data = struct.unpack(format_string, bdata)
-            logger.info(f"Device ID: %02x",unpacked_data[0])
+            logger.info("Device ID: %02x",unpacked_data[0])
 
 
     def t_version(self):
@@ -106,8 +103,8 @@ class TestBench:
             version_bytes, serial_bytes = byte_array.split(b'\0',1)
             versiondev = version_bytes.decode('ascii')
             serial = serial_bytes.decode('ascii').rstrip('\x00')
-            logger.info(f"Version: {versiondev}")
-            logger.info(f"Serial Number: {serial}")
+            logger.info(f"Version: %s",versiondev)
+            logger.info("Serial Number: %s",serial)
 
 
     def t_sensors(self):
@@ -136,9 +133,8 @@ class TestBench:
         time.sleep(1)
 
     def t_led(self):
-        for i in range(3):
+        for _ in range(3):
             self.ms_host.ms_led(1)
             time.sleep(0.5)
             self.ms_host.ms_led(0)
             time.sleep(0.5)
-

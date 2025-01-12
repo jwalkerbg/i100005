@@ -1,12 +1,11 @@
 # src/cli/app.py
 import argparse
 import time
-import struct
 from importlib.metadata import version
 from typing import Dict, Tuple
 
 from mqttms import MQTTms, MQTTDispatcher
-import smartfan.utils.utilities
+# import smartfan.utils.utilities
 from smartfan.core.config import Config
 from smartfan.logger import getAppLogger
 from smartfan.core.ms_host import MShost
@@ -72,12 +71,12 @@ def main():
     config_file = args.config
     try:
         cfg.load_config_file(config_file)
-    except Exception as e:
-        logger.info(f"Error with loading configuration file. Giving up.")
+    except Exception:
+        logger.info("Error with loading configuration file. Giving up.")
         return
 
     # Step 4: Merge default config, config.json, and command-line arguments
-    cfg.merge_options(cfg.config, args)
+    cfg.merge_options(args)
 
     # Step 5: Run the application with collected configuration
     if cfg.config['metadata']['version']:
