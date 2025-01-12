@@ -139,3 +139,6 @@ class MShost:
 
     def ms_testmode(self):
         return self.ms_simple_command("TM")
+
+    def ms_led(self, mode:int):
+        return self.ms_command_send_uint8("LE",mode)

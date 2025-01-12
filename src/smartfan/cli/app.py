@@ -138,7 +138,7 @@ def run_app(config:Config) -> None:
         # Wait for a while to give the server chance to connecet to WhiFI and MQTT broker
         time.sleep(0.5)
 
-        tb.tests()
+        tb.run_tests()
 
     except KeyboardInterrupt:
         logger.warning("Application stopped by user (Ctrl-C). Exiting...")

@@ -1,5 +1,6 @@
 # testbench/tbench.py
 
+import time
 import struct
 
 from mqttms import MQTTms
@@ -25,9 +26,19 @@ class MACAddressValidator(Validator):
 
 
 class TestBench:
+    MOT_PHASE_FAST = 4
+    MOT_PHASE_SLOW = 6
+    MOT_STOP = 0
+
     def __init__(self, config: dict):
         self.config = config
-
+        self.tests = [
+                (self.t_who_am_i, "Who Am I" ),
+                (self.t_version, "Version" ),
+                (self.t_sensors, "Sensors" ),
+                (self.t_motor, "Motor" ),
+                (self.t_led, "Led")
+            ]
 
     def set_ms_mqtt(self, ms_host:MShost, mqttms:MQTTms):
         self.ms_host = ms_host
@@ -61,12 +72,12 @@ class TestBench:
             return
 
 
-    def tests(self):
+    def run_tests(self):
         logger.info("TestBench.tests")
 
         self.ms_subscribe()
 
-        # This is called after succcessful binding o this command must be first one
+        # This is called after succcessful binding and this command must be first one
 
         payload = self.ms_host.ms_mqtt_ready()
         resp = payload.get("response","")
@@ -74,12 +85,19 @@ class TestBench:
             logger.error("API_MQTT_READy received answer: {resp}")
             return
 
-        self.t_who_am_i()
-        self.t_version()
-        self.t_sensors()
+        for test in self.tests:
+            logger.info("")
+            logger.info(f"**** Test {test[1]} ****")
+            test[0]()
 
     def t_who_am_i(self):
         payload = self.ms_host.ms_who_am_i()
+        if payload.get("response","") == "OK":
+            jdata = payload.get('data', None)
+            format_string = '<B'
+            bdata = bytes.fromhex(jdata)
+            unpacked_data = struct.unpack(format_string, bdata)
+            logger.info(f"Device ID: %02x",unpacked_data[0])
 
 
     def t_version(self):
@@ -94,12 +112,6 @@ class TestBench:
             logger.info(f"Serial Number: {serial}")
 
 
-    def t_led(self):
-        pass
-
-    def t_motor(self):
-        pass
-
     def t_sensors(self):
         payload = self.ms_host.ms_sensors()
         if payload.get("response","") == "OK":
@@ -108,11 +120,27 @@ class TestBench:
             bdata = bytes.fromhex(jdata)
             unpacked_data = struct.unpack(format_string, bdata)
             logger.info(f"MSH unpacked_data = {unpacked_data}")
+            logger.info(f"\nTemperature: {unpacked_data[0]/100}\nPressure: {unpacked_data[1]/100} hPa\nHumidity: {unpacked_data[2]/1000} %\nGas:{unpacked_data[3]} Ohm\nAmbient light: {unpacked_data[4]}\nSensors: {unpacked_data[5]:x}\nMotor: {unpacked_data[6]:x}\nDevice state: {unpacked_data[7]:x}")
         else:
             logger.info("MSH: No valid data received")
 
 
+    def t_motor(self):
+        self.ms_host.ms_motor(self.MOT_STOP)
+        time.sleep(1)
+        self.ms_host.ms_motor(self.MOT_PHASE_SLOW)
+        time.sleep(2)
+        self.ms_host.ms_motor(self.MOT_STOP)
+        time.sleep(1)
+        self.ms_host.ms_motor(self.MOT_PHASE_FAST)
+        time.sleep(2)
+        self.ms_host.ms_motor(self.MOT_STOP)
+        time.sleep(1)
 
-
-
+    def t_led(self):
+        for i in range(3):
+            self.ms_host.ms_led(1)
+            time.sleep(0.5)
+            self.ms_host.ms_led(0)
+            time.sleep(0.5)
 
