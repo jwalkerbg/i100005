@@ -40,9 +40,8 @@ class TestBench:
                 (self.t_led, "Led")
             ]
 
-    def set_ms_mqtt(self, ms_host:MShost, mqttms:MQTTms):
+    def set_ms_host(self, ms_host:MShost):
         self.ms_host = ms_host
-        self.mqttms=mqttms
 
 
     def ble_binding(self) -> bool :
@@ -62,8 +61,7 @@ class TestBench:
     def ms_subscribe(self):
         # subscribe to server topics
         try:
-            logger.info(f"ms_subscribe topic: %s",self.mqttms.ms_protocol.config)
-            res = self.mqttms.subscribe()
+            res = self.ms_host.ms_protocol.subscribe()
             if not res:
                 logger.error(f"Cannot subscribe to MQTT broker.")
                 return

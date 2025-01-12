@@ -108,12 +108,9 @@ def run_app(config:Config) -> None:
         # Тhe server knows WiFi credentials and connects to MQTT broker
         # the client (this app) knows MAC address of the server
 
-        # Step 2) Connect to MQTT broker and send API_MQQT_READY command
-        # create AppMQTTDispatcher object
-        appdipatcher = AppMQTTDispatcher(config.config)
-
-        # create object
+        # create MQTTms mqttms object to work with
         try:
+            appdipatcher = AppMQTTDispatcher(config.config)
             mqttms = MQTTms(config.config['mqttms'],config.config['logging'],appdipatcher)
         except Exception as e:
             logger.error(f"Cannot create MQTTMS object. Giving up: {e}")
@@ -133,7 +130,7 @@ def run_app(config:Config) -> None:
         # create ms_host object if all above went well
         ms_host = MShost(ms_protocol=mqttms.ms_protocol,config=config)
 
-        tb.set_ms_mqtt(ms_host=ms_host,mqttms=mqttms)
+        tb.set_ms_host(ms_host=ms_host)
 
         # Wait for a while to give the server chance to connecet to WhiFI and MQTT broker
         time.sleep(0.5)
