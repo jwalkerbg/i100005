@@ -7,11 +7,11 @@ from typing import Dict, Tuple
 from mqttms import MQTTms, MQTTDispatcher
 # import smartfan.utils.utilities
 from smartfan.core.config import Config
-from smartfan.logger import getAppLogger
+from smartfan.logger import get_app_logger
 from smartfan.core.ms_host import MShost
 from smartfan.testbench import TestBench
 
-logger = getAppLogger(__name__)
+logger = get_app_logger(__name__)
 
 class AppMQTTDispatcher(MQTTDispatcher):
     def __init__(self, config: Dict):

@@ -6,10 +6,10 @@ import re
 from prompt_toolkit import prompt
 from prompt_toolkit.validation import Validator, ValidationError
 
-from smartfan.logger import getAppLogger
+from smartfan.logger import get_app_logger
 from smartfan.core import MShost
 
-logger = getAppLogger(__name__)
+logger = get_app_logger(__name__)
 
 class MACAddressValidator(Validator):
     def validate(self, document):

@@ -2,9 +2,9 @@
 
 import struct
 from  mqttms import MSProtocol
-from smartfan.logger import getAppLogger
+from smartfan.logger import get_app_logger
 
-logger = getAppLogger(__name__)
+logger = get_app_logger(__name__)
 
 class MShost:
     def __init__(self, ms_protocol: MSProtocol, config):

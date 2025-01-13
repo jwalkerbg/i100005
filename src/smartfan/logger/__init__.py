@@ -1,3 +1,3 @@
 # logger/logger_module.py
 
-from .logger_module import getAppLogger, addStringHandler, StringHandler, enableStringHandler, disableStringHandler, getStringLogs, clearStringLogs
+from .logger_module import get_app_logger, add_string_handler, StringHandler, enable_string_handler, disable_string_handler, get_string_logs, clear_string_logs
