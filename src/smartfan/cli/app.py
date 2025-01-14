@@ -141,7 +141,8 @@ def run_app(config:Config) -> None:
 
     finally:
         # Graceful exit on Ctrl-C
-        mqttms.graceful_exit()
+        if 'mqttms' in locals():
+            mqttms.graceful_exit()
         logger.info("Exiting run_app")
 
 if __name__ == "__main__":
