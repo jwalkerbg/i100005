@@ -109,7 +109,14 @@ class Config:
                 "additionalProperties": False
             },
             "tests": {
-                "type": "object"
+                "type": "object",
+                "properties": {
+                    "idn": { "type": "string"},
+                    "serial_date": {"type": "string"},
+                    "serialn": {"type": "string"},
+                    "serial_separator": { "type": "string" }
+                },
+                "required": ["serial_date", "serialn"]
             }
         },
         "required": ["logging", "mqttms", "tests"],

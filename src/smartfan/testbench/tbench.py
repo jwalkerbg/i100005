@@ -34,7 +34,8 @@ class TestBench:
                 (self.t_version, "Version" ),
                 (self.t_sensors, "Sensors" ),
                 (self.t_motor, "Motor" ),
-                (self.t_led, "Led")
+                (self.t_led, "Led"),
+                (self.t_serialn, "Serial N")
             ]
 
     def set_ms_host(self, ms_host:MShost):
@@ -138,3 +139,20 @@ class TestBench:
             time.sleep(0.5)
             self.ms_host.ms_led(0)
             time.sleep(0.5)
+
+    def t_serialn(self):
+        idn = self.config.get("tests").get("idn")
+        serial_date = self.config.get("tests").get("serial_date")
+        serialn = self.config.get("tests").get("serialn")
+        serial_separator =  self.config.get("tests").get("serial_separator")
+        snstr = idn + serial_separator + serial_date + serial_separator + serialn
+
+        snstr = prompt("Serial number: ", default=snstr)
+
+        logger.info(f" S/N: %s",snstr)
+
+        payload = self.ms_host.ms_serial(snstr)
+        if payload.get("response","") == "OK":
+            logger.info("Serial number is written")
+        else:
+            logger.info("Serial number was not set")
