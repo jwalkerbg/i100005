@@ -83,7 +83,7 @@ class TestBench:
 
         for test in self.tests:
             logger.info("")
-            logger.info("**** Test %s ****",{test[1]})
+            logger.info("**** Test %s ****",test[1])
             test[0]()
 
     def t_who_am_i(self):
