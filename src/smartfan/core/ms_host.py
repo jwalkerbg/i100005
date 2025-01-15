@@ -1,12 +1,10 @@
 # ms_host.py
 
-import time
-import json
 import struct
 from  mqttms import MSProtocol
-from smartfan.logger import getAppLogger
+from smartfan.logger import get_app_logger
 
-logger = getAppLogger(__name__)
+logger = get_app_logger(__name__)
 
 class MShost:
     def __init__(self, ms_protocol: MSProtocol, config):
@@ -25,6 +23,18 @@ class MShost:
 
     def ms_command_send_uint16(self, cmd: str, value: int):
         format_string = '<H'
+        pd = struct.pack(format_string,value).hex()
+        payload = f'{{"command":"{cmd}","data":"{pd}"}}'
+        self.ms_protocol.put_command(payload)
+
+        self.ms_protocol.response_received.wait()
+        payload = self.ms_protocol.response
+        logger.info(f"MSH response: {payload}")
+        self.ms_protocol.response_received.clear()
+        return payload
+
+    def ms_command_send_uint8(self, cmd: str, value: int):
+        format_string = '<B'
         pd = struct.pack(format_string,value).hex()
         payload = f'{{"command":"{cmd}","data":"{pd}"}}'
         self.ms_protocol.put_command(payload)
@@ -120,3 +130,15 @@ class MShost:
         logger.info(f"MSH response: {payload}")
         self.ms_protocol.response_received.clear()
         return payload
+
+    def ms_getmachid(self):
+        return self.ms_simple_command("ZA")
+
+    def ms_motor(self, mode:int):
+        return self.ms_command_send_uint8("MT",mode)
+
+    def ms_testmode(self):
+        return self.ms_simple_command("TM")
+
+    def ms_led(self, mode:int):
+        return self.ms_command_send_uint8("LE",mode)

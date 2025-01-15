@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "smartfan"
-version = "2.0.1"
+version = "2.1.0"
 description = "CLI for working with smart fans"
 readme = "README.md"
 authors = ["Ivan Cenov <i_cenov@botevgrad.com>"]
@@ -17,12 +17,14 @@ python = ">=3.12"
 cython = ">=3.0"
 setuptools = ">=68.0.0"
 tomli = { version = "*", markers = "python_version < '3.11'" }
-numpy = "*"
+numpy = "2.2.0"
 importlib = "*"
 paho-mqtt = "*"
 jsonschema = "*"
 types-jsonschema = "*"
 rfc3986 = "*"
+typer = "*"
+prompt-toolkit = ">=3.0.40"
 mqttms = {path = "../../100004/i100004"}
 
 # Development dependencies
@@ -30,6 +32,7 @@ mqttms = {path = "../../100004/i100004"}
 mypy = "^1.5.1"  # Static type checker
 pathlib = ">=1.0"
 build = "^1.2.2.post1"
+pylint = "^3.3.3"
 
 # Test dependencies
 [tool.poetry.group.test.dependencies]
@@ -59,3 +62,7 @@ script = 'build.py'
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = "src"
+
+[tool.pylint]
+disable = "missing-docstring"
+max-line-length = 200

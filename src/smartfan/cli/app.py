@@ -5,12 +5,13 @@ from importlib.metadata import version
 from typing import Dict, Tuple
 
 from mqttms import MQTTms, MQTTDispatcher
-import smartfan.utils.utilities
+# import smartfan.utils.utilities
 from smartfan.core.config import Config
-from smartfan.logger import getAppLogger
+from smartfan.logger import get_app_logger
 from smartfan.core.ms_host import MShost
+from smartfan.testbench import TestBench
 
-logger = getAppLogger(__name__)
+logger = get_app_logger(__name__)
 
 class AppMQTTDispatcher(MQTTDispatcher):
     def __init__(self, config: Dict):
@@ -70,12 +71,12 @@ def main():
     config_file = args.config
     try:
         cfg.load_config_file(config_file)
-    except Exception as e:
-        logger.info(f"Error with loading configuration file. Giving up.")
+    except Exception:
+        logger.info("Error with loading configuration file. Giving up.")
         return
 
     # Step 4: Merge default config, config.json, and command-line arguments
-    cfg.merge_options(cfg.config, args)
+    cfg.merge_options(args)
 
     # Step 5: Run the application with collected configuration
     if cfg.config['metadata']['version']:
@@ -86,16 +87,29 @@ def main():
 
 # CLI application main function with collected options & configuration
 def run_app(config:Config) -> None:
+
+    print(f"config = {config.config}")
+
     try:
         logger.info("Running run_app")
         if config.config.get('logging').get('verbose', False):
             logger.info(f"config = {config.config}")
 
-        # create AppMQTTDispatcher object
-        appdipatcher = AppMQTTDispatcher(config.config)
+        # Create testBench object
+        tb = TestBench(config.config)
 
-        # create object
+        # Step 1) BLE binding, exchange WIFi credentials / MAC address
+        if not tb.ble_binding():
+            logger.error("Cannot bind with server via BLE")
+            return
+
+        # At this point:
+        # Тhe server knows WiFi credentials and connects to MQTT broker
+        # the client (this app) knows MAC address of the server
+
+        # create MQTTms mqttms object to work with
         try:
+            appdipatcher = AppMQTTDispatcher(config.config)
             mqttms = MQTTms(config.config['mqttms'],config.config['logging'],appdipatcher)
         except Exception as e:
             logger.error(f"Cannot create MQTTMS object. Giving up: {e}")
@@ -112,71 +126,23 @@ def run_app(config:Config) -> None:
             logger.error(f"Cannot connect to MQTT broker: {e}.")
             return
 
-        # subscribe
-        try:
-            ras = mqttms.subscribe("/Artifical/topic/to/see/if/it/works")
-            res = mqttms.subscribe()
-            if not res:
-                logger.error(f"Cannot subscribe to MQTT broker.")
-                return
-        except Exception as e:
-            logger.error(f"Cannot subscribe to MQTT broker: {e}")
-            return
-
         # create ms_host object if all above went well
         ms_host = MShost(ms_protocol=mqttms.ms_protocol,config=config)
 
-        # main loop of the program
-        try:
-            while True:
-                # Simulate doing some work (replace this with actual logic)
-                # payload = ms_host.ms_sensors()
-                # if payload.get("response","") == "OK":
-                #     jdata = payload.get('data', None)
-                #     format_string = '<hIIIHBBB'
-                #     bdata = bytes.fromhex(jdata)
-                #     unpacked_data = struct.unpack(format_string, bdata)
-                #     logger.info(f"MSH unpacked_data = {unpacked_data}")
-                # else:
-                #     logger.info("MSH: No valid data received")
+        tb.set_ms_host(ms_host=ms_host)
 
-                payload = ms_host.ms_who_am_i()
+        # Wait for a while to give the server chance to connecet to WhiFI and MQTT broker
+        time.sleep(0.5)
 
-                mqttms.publish("/Artifical/topic/to/see/if/it/works", '{"key":"value"}')
-                payload = ms_host.ms_version()
-                if payload.get("response","") == "OK":
-                    jdata = payload.get('data', None)
-                    byte_array = bytes.fromhex(jdata)
-                    version_bytes, serial_bytes = byte_array.split(b'\0',1)
-                    versiondev = version_bytes.decode('ascii')
-                    serial = serial_bytes.decode('ascii').rstrip('\x00')
-                    logger.info(f"Version: {versiondev}")
-                    logger.info(f"Serial Number: {serial}")
+        tb.run_tests()
 
-                # payload = ms_host.ms_serial("2407-0002")
-
-                # payload = ms_host.ms_wificred("iv_cenov", "6677890vla")
-
-                # payload = ms_host.ms_get_params()
-
-                # payload = ms_host.ms_set_mode(0)
-                # payload = ms_host.ms_set_amb_thr(1024)
-                # payload = ms_host.ms_set_hum_thr(75)
-                # payload = ms_host.ms_set_hum_thr(100)
-
-                # payload = ms_host.ms_set_gas_thr(16000)
-                # payload = ms_host.ms_set_gas_thr(50000)
-
-                # payload = ms_host.ms_set_forced_time(25)
-                # payload = ms_host.ms_set_forced_time(61)
-
-                time.sleep(5)  # Sleep to avoid busy-waiting
-        except KeyboardInterrupt:
-            # Graceful exit on Ctrl-C
-            mqttms.graceful_exit()
-            logger.warning("Application stopped by user (Ctrl-C). Exiting...")
+    except KeyboardInterrupt:
+        logger.warning("Application stopped by user (Ctrl-C). Exiting...")
 
     finally:
+        # Graceful exit on Ctrl-C
+        if 'mqttms' in locals():
+            mqttms.graceful_exit()
         logger.info("Exiting run_app")
 
 if __name__ == "__main__":
