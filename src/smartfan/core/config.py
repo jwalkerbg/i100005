@@ -3,19 +3,17 @@
 import sys
 from typing import Dict, Any
 import argparse
-import json
 from jsonschema import validate, ValidationError
-import importlib.resources as resources
 
-from smartfan.logger import getAppLogger
+from smartfan.logger import get_app_logger
 
-logger = getAppLogger(__name__)
+logger = get_app_logger(__name__)
 
 # Check Python version at runtime
 if sys.version_info >= (3, 11):
-    import tomllib  # Use the built-in tomllib for Python 3.11+
+    import tomllib as toml  # Use the built-in tomllib for Python 3.11+
 else:
-    import tomli  # Use the external tomli for Python 3.7 to 3.10
+    import tomli as toml # Use the external tomli for Python 3.7 to 3.10
 
 class Config:
     def __init__(self) -> None:
@@ -50,6 +48,9 @@ class Config:
                 'rsp_topic': '@/client_mac/RSP/format',
                 'timeout': 5.0
             }
+        },
+        "tests": {
+
         }
     }
 
@@ -106,9 +107,19 @@ class Config:
                 },
                 "required": ["mqtt", "ms"],
                 "additionalProperties": False
+            },
+            "tests": {
+                "type": "object",
+                "properties": {
+                    "idn": { "type": "string"},
+                    "serial_date": {"type": "string"},
+                    "serialn": {"type": "string"},
+                    "serial_separator": { "type": "string" }
+                },
+                "required": ["serial_date", "serialn"]
             }
         },
-        "required": ["logging", "mqttms"],
+        "required": ["logging", "mqttms", "tests"],
         "additionalProperties": False
     }
 
@@ -124,15 +135,12 @@ class Config:
         try:
             # Open the file in binary mode (required by both tomli and tomllib)
             with open(file_path, 'rb') as f:
-                if sys.version_info >= (3, 11):
-                    return tomllib.load(f)  # Use tomllib for Python 3.11+
-                else:
-                    return tomli.load(f)  # Use tomli for Python 3.7 - 3.10
+                return toml.load(f)
 
         except FileNotFoundError as e:
             logger.error(f"{e}")
             raise e  # Optionally re-raise the exception if you want to propagate it
-        except (tomli.TOMLDecodeError if sys.version_info < (3, 11) else tomllib.TOMLDecodeError) as e:
+        except toml.TOMLDecodeError as e:
             logger.error(f"Error: Failed to parse TOML file '{file_path}'. Invalid TOML syntax.")
             raise e  # Re-raise the exception for further handling
         except Exception as e:
@@ -182,7 +190,7 @@ class Config:
                 # Otherwise, update the key with the new value from config_file
                 config[key] = value
 
-    def merge_options(self, config_file:Dict, config_cli:argparse.Namespace=None) -> Dict:
+    def merge_options(self, config_cli:argparse.Namespace=None) -> Dict:
         # handle CLI options if started from CLI interface
 
         # Handle MQTT CLI overrides
@@ -224,25 +232,24 @@ class Config:
 
     def log_configuration(self):
         logger.info("Running in verbose mode.")
-        logger.info(f"Final Configuration: {self.config}")
 
         # MQTT configuration
         mqtt_config = self.config['mqttms']['mqtt']
-        logger.info(f"MQTT Configuration:")
-        logger.info(f"  Host: {mqtt_config['host']}")
-        logger.info(f"  Port: {mqtt_config['port']}")
-        logger.info(f"  Username: {mqtt_config.get('username', 'N/A')}")
-        logger.info(f"  Password: {mqtt_config.get('password', 'N/A')}")
-        logger.info(f"  Client ID: {mqtt_config.get('client_id', 'N/A')}")
-        logger.info(f"  Timeout: {mqtt_config.get('timeout', 'N/A')}")
-        logger.info(f"  Long payloads threshold: {mqtt_config.get('long_payload', 'N/A')}")
+        logger.info("MQTT Configuration:")
+        logger.info("  Host: %s",mqtt_config['host'])
+        logger.info("  Port: %d",mqtt_config['port'])
+        logger.info("  Username: %s",mqtt_config.get('username', 'N/A'))
+        logger.info("  Password: %s",mqtt_config.get('password', 'N/A'))
+        logger.info("  Client ID: %s",mqtt_config.get('client_id', 'N/A'))
+        logger.info("  Timeout: %d",mqtt_config.get('timeout', 'N/A'))
+        logger.info("  Long payloads threshold: %d",mqtt_config.get('long_payload', 'N/A'))
 
         ms_config = self.config['mqttms']['ms']
-        logger.info(f"MS Configuration")
-        logger.info(f"  Client (master) MAC: {ms_config.get('client_mac', 'N/A')}")
-        logger.info(f"  Server (slave) MAC:  {ms_config.get('server_mac', 'N/A')}")
-        logger.info(f"  Command topic:  {ms_config.get('cmd_topic', 'N/A')}")
-        logger.info(f"  Response topic: {ms_config.get('rsp_topic', 'N/A')}")
-        logger.info(f"  MS protocol timeout: {ms_config.get('timeout', 'N/A')}")
+        logger.info("MS Configuration")
+        logger.info("  Client (master) MAC: %s",ms_config.get('client_mac', 'N/A'))
+        logger.info("  Server (slave) MAC:  %s",ms_config.get('server_mac', 'N/A'))
+        logger.info("  Command topic:  %s",ms_config.get('cmd_topic', 'N/A'))
+        logger.info("  Response topic: %s",ms_config.get('rsp_topic', 'N/A'))
+        logger.info("  MS protocol timeout: %f",ms_config.get('timeout', 'N/A'))
 
         logger.info("Application started with the above configuration...")
