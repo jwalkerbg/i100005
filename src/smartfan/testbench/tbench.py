@@ -74,6 +74,12 @@ class TestBench:
         self.ms_subscribe()
 
         # This is called after succcessful binding and this command must be first one
+        payload = self.ms_host.ms_wificred("*","*")
+        if payload.get("response","") == "OK":
+            logger.info("WiFi credentials successfully cleared")
+        else:
+            logger.info("WiFi credentials were not cleared")
+            return
 
         payload = self.ms_host.ms_mqtt_ready()
         resp = payload.get("response","")
