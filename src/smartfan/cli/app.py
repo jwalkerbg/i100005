@@ -55,6 +55,8 @@ def parse_args():
     parser.add_argument("--ms-cmd-topic", type=str, dest='ms_cmd_topic', help="Template of command topic.")
     parser.add_argument("--ms-rsp-topic", type=str, dest='ms_rsp_topic', help="Template of response topic.")
     parser.add_argument("--ms-timeout", type=float, dest='ms_timeout', help="Timeout used in protocol to wait for response.")
+
+    # tests
     parser.add_argument("--motoron", type=float, dest='motoron', help="Time to maintain motor enabled in tests")
     parser.add_argument("--motoroff", type=float, dest='motoroff', help="Time to maintain motor disabled in tests")
 
