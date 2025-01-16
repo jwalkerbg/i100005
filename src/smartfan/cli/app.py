@@ -56,6 +56,9 @@ def parse_args():
     parser.add_argument("--ms-rsp-topic", type=str, dest='ms_rsp_topic', help="Template of response topic.")
     parser.add_argument("--ms-timeout", type=float, dest='ms_timeout', help="Timeout used in protocol to wait for response.")
 
+    # operative options
+    parser.add_argument("--sn-only", dest='snonly', action='store_const', const=True, default=False, help="Write only serial number without any tests. Expects device with valid WiFi credentials, connected to the Internet.")
+
     return parser.parse_args()
 
 def main():

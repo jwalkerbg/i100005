@@ -37,6 +37,9 @@ class TestBench:
                 (self.t_led, "Led"),
                 (self.t_serialn, "Serial N")
             ]
+        self.snonly = [
+            (self.t_serialn, "Serial N")
+        ]
 
     def set_ms_host(self, ms_host:MShost):
         self.ms_host = ms_host
@@ -73,21 +76,26 @@ class TestBench:
 
         self.ms_subscribe()
 
-        # This is called after succcessful binding and this command must be first one
-        payload = self.ms_host.ms_wificred("*","*")
-        if payload.get("response","") == "OK":
-            logger.info("WiFi credentials successfully cleared")
+
+        if self.config["options"]["snonly"]:
+            testarray = self.snonly
         else:
-            logger.info("WiFi credentials were not cleared")
-            return
+            # This is called after succcessful binding and this command must be first one
+            payload = self.ms_host.ms_wificred("*","*")
+            if payload.get("response","") == "OK":
+                logger.info("WiFi credentials successfully cleared")
+            else:
+                logger.info("WiFi credentials were not cleared")
+                return
 
-        payload = self.ms_host.ms_mqtt_ready()
-        resp = payload.get("response","")
-        if resp != "OK":
-            logger.error("API_MQTT_READy received answer: {resp}")
-            return
+            payload = self.ms_host.ms_mqtt_ready()
+            resp = payload.get("response","")
+            if resp != "OK":
+                logger.error("API_MQTT_READy received answer: {resp}")
+                return
+            testarray = self.tests
 
-        for test in self.tests:
+        for test in testarray:
             logger.info("")
             logger.info("**** Test %s ****",test[1])
             test[0]()

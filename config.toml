@@ -22,3 +22,6 @@ idn = "109380"
 serial_date = "2501"
 serial_separator = "-"
 serialn = "0000001"
+
+#[options]
+#snonly = false

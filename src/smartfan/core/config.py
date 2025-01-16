@@ -50,7 +50,9 @@ class Config:
             }
         },
         "tests": {
-
+        },
+        "options": {
+            "snonly": False
         }
     }
 
@@ -117,6 +119,12 @@ class Config:
                     "serial_separator": { "type": "string" }
                 },
                 "required": ["serial_date", "serialn"]
+            },
+            "options": {
+                "type": "object",
+                "properties": {
+                    "snonly": { "type": "boolean" }
+                }
             }
         },
         "required": ["logging", "mqttms", "tests"],
@@ -227,6 +235,10 @@ class Config:
             # Handle general options
             if config_cli.verbose is not None:
                 self.config['logging']['verbose'] = config_cli.verbose
+
+            # operatione options
+            if config_cli.snonly is not None:
+                self.config['options']['snonly'] = config_cli.snonly
 
         return self.config
 
