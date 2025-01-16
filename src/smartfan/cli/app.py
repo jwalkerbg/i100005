@@ -58,6 +58,7 @@ def parse_args():
 
     # operative options
     parser.add_argument("--sn-only", dest='snonly', action='store_const', const=True, default=False, help="Write only serial number without any tests. Expects device with valid WiFi credentials, connected to the Internet.")
+    parser.add_argument("--dut-delay", type=float, dest='dutdelay', help="Delay after BLE pairing and connecting to MQTT before start of tests driven by MS protocol over MQTT. This time allows DUT to setup WiFi/MQTT connection.")
 
     return parser.parse_args()
 
@@ -134,8 +135,8 @@ def run_app(config:Config) -> None:
 
         tb.set_ms_host(ms_host=ms_host)
 
-        # Wait for a while to give the server chance to connecet to WhiFI and MQTT broker
-        time.sleep(0.5)
+        # Wait for a while to give the server chance to connecet to WiFi and MQTT broker
+        time.sleep(config.config['options']['dutdelay'])
 
         tb.run_tests()
 

@@ -56,7 +56,8 @@ class Config:
             "serial_separator": "-"
         },
         "options": {
-            "snonly": False
+            "snonly": False,
+            "dutdelay": 2.0
         }
     }
 
@@ -127,7 +128,8 @@ class Config:
             "options": {
                 "type": "object",
                 "properties": {
-                    "snonly": { "type": "boolean" }
+                    "snonly": { "type": "boolean" },
+                    "dutdelay": { "type": "number"}
                 }
             }
         },
@@ -243,6 +245,8 @@ class Config:
             # operatione options
             if config_cli.snonly is not None:
                 self.config['options']['snonly'] = config_cli.snonly
+            if config_cli.dutdelay is not None:
+                self.config['options']['dutdelay'] = config_cli.dutdelay
 
         return self.config
 
