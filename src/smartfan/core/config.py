@@ -50,6 +50,10 @@ class Config:
             }
         },
         "tests": {
+            "idn": "999999",
+            "serial_date": "2501",
+            "serialn": "0000001",
+            "serial_separator": "-"
         },
         "options": {
             "snonly": False
