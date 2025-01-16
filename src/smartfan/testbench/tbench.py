@@ -136,16 +136,18 @@ class TestBench:
 
 
     def t_motor(self):
+        motoron = self.config.get("tests").get("motoron", 3.0)
+        motoroff = self.config.get("tests").get("motoroff", 1.0)
         self.ms_host.ms_motor(self.MOT_STOP)
-        time.sleep(1)
+        time.sleep(motoroff)
         self.ms_host.ms_motor(self.MOT_PHASE_SLOW)
-        time.sleep(2)
+        time.sleep(motoron)
         self.ms_host.ms_motor(self.MOT_STOP)
-        time.sleep(1)
+        time.sleep(motoroff)
         self.ms_host.ms_motor(self.MOT_PHASE_FAST)
-        time.sleep(2)
+        time.sleep(motoron)
         self.ms_host.ms_motor(self.MOT_STOP)
-        time.sleep(1)
+        time.sleep(motoroff)
 
     def t_led(self):
         for _ in range(3):

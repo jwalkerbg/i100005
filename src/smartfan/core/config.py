@@ -53,7 +53,9 @@ class Config:
             "idn": "999999",
             "serial_date": "2501",
             "serialn": "0000001",
-            "serial_separator": "-"
+            "serial_separator": "-",
+            "motoron": 3.0,
+            "motoroff": 1.0
         },
         "options": {
             "snonly": False,
@@ -121,7 +123,9 @@ class Config:
                     "idn": { "type": "string"},
                     "serial_date": {"type": "string"},
                     "serialn": {"type": "string"},
-                    "serial_separator": { "type": "string" }
+                    "serial_separator": { "type": "string" },
+                    "motoron": { "type": "number" },
+                    "motoroff": { "type": "number" }
                 },
                 "required": ["serial_date", "serialn"]
             },
@@ -241,6 +245,12 @@ class Config:
             # Handle general options
             if config_cli.verbose is not None:
                 self.config['logging']['verbose'] = config_cli.verbose
+
+            # test options
+            if config_cli.motoron is not None:
+                self.config['tests']['motoron'] = config_cli.motoron
+            if config_cli.motoroff is not None:
+                self.config['tests']['motoroff'] = config_cli.motoroff
 
             # operatione options
             if config_cli.snonly is not None:
