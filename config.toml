@@ -18,7 +18,7 @@ timeout = 5.0
 verbose = false
 
 [dut]
-ident = "222310938033"
+ident = "109380"
 name = "Smart Ventilator"
 serial_date = "2501"
 serialn = "0000001"
