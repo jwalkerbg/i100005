@@ -157,10 +157,10 @@ class TestBench:
             time.sleep(0.5)
 
     def t_serialn(self):
-        idn = self.config.get("tests").get("idn")
-        serial_date = self.config.get("tests").get("serial_date")
-        serialn = self.config.get("tests").get("serialn")
-        serial_separator =  self.config.get("tests").get("serial_separator")
+        idn = self.config.get("dut").get("ident")
+        serial_date = self.config.get("dut").get("serial_date")
+        serialn = self.config.get("dut").get("serialn")
+        serial_separator =  self.config.get("dut").get("serial_separator")
         snstr = idn + serial_separator + serial_date + serial_separator + serialn
 
         snstr = prompt("Serial number: ", default=snstr)

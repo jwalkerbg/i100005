@@ -17,11 +17,16 @@ timeout = 5.0
 [logging]
 verbose = false
 
-[tests]
-idn = "109380"
+[dut]
+ident = "222310938033"
+name = "Smart Ventilator"
 serial_date = "2501"
-serial_separator = "-"
 serialn = "0000001"
+serial_separator = "-"
+
+[tests]
+motoron = 3.0
+motoroff = 1.0
 
 [options]
 snonly = false

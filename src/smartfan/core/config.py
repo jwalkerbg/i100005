@@ -49,11 +49,14 @@ class Config:
                 'timeout': 5.0
             }
         },
-        "tests": {
-            "idn": "999999",
+        "dut": {
+            "ident": "999999",
+            "name": "device",
             "serial_date": "2501",
             "serialn": "0000001",
-            "serial_separator": "-",
+            "serial_separator": "-"
+        },
+        "tests": {
             "motoron": 3.0,
             "motoroff": 1.0
         },
@@ -117,17 +120,22 @@ class Config:
                 "required": ["mqtt", "ms"],
                 "additionalProperties": False
             },
+            "dut" :{
+                "type": "object",
+                "properties": {
+                    "ident": { "type": "string"},
+                    "name": { "typ": "string" },
+                    "serial_date": { "type": "string"},
+                    "serialn": { "type": "string"},
+                    "serial_separator": { "type": "string" }
+                }
+            },
             "tests": {
                 "type": "object",
                 "properties": {
-                    "idn": { "type": "string"},
-                    "serial_date": {"type": "string"},
-                    "serialn": {"type": "string"},
-                    "serial_separator": { "type": "string" },
                     "motoron": { "type": "number" },
                     "motoroff": { "type": "number" }
-                },
-                "required": ["serial_date", "serialn"]
+                }
             },
             "options": {
                 "type": "object",
@@ -137,7 +145,7 @@ class Config:
                 }
             }
         },
-        "required": ["logging", "mqttms", "tests"],
+        "required": ["logging", "mqttms"],
         "additionalProperties": False
     }
 
@@ -245,6 +253,18 @@ class Config:
             # Handle general options
             if config_cli.verbose is not None:
                 self.config['logging']['verbose'] = config_cli.verbose
+
+            # dut options
+            if config_cli.dut_ident is not None:
+                self.config['dut']['ident'] = config_cli.dut_ident
+            if config_cli.dut_name is not None:
+                self.config['dut']['name'] = config_cli.dut_name
+            if config_cli.dut_serial_date is not None:
+                self.config['dut']['serial_date'] = config_cli.dut_serial_date
+            if config_cli.dut_serialn is not None:
+                self.config['dut']['serialn'] = config_cli.dut_serialn
+            if config_cli.serial_separator is not None:
+                self.config['dut']['serial_separator'] = config_cli.serial_separator
 
             # test options
             if config_cli.motoron is not None:

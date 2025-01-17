@@ -58,6 +58,14 @@ def parse_args():
     ms_group.add_argument("--ms-rsp-topic", type=str, dest='ms_rsp_topic', help="Template of response topic.")
     ms_group.add_argument("--ms-timeout", type=float, dest='ms_timeout', help="Timeout used in protocol to wait for response.")
 
+    # dut
+    dut_group = parser.add_argument_group('DUT Data')
+    dut_group.add_argument("--dut-ident", type=str, dest='dut_ident', help="ID Number of Device Under Test")
+    dut_group.add_argument("--dut-name", type=str, dest='dut_name', help="Device name")
+    dut_group.add_argument("--dut-serial-date", type=str, dest='dut_serial_date', help="Date as part of serial number")
+    dut_group.add_argument("--dut-serialn", type=str, dest='dut_serialn', help="Serial number of the Device Under Test")
+    dut_group.add_argument("--dut-sn-separator", type=str, dest='serial_separator', help="Separator string or symbol used to separate parts of the serial number")
+
     # tests
     tests_group = parser.add_argument_group('Tests Options')
     tests_group.add_argument("--motoron", type=float, dest='motoron', help="Time to maintain motor enabled in tests")
