@@ -56,7 +56,7 @@ class TestBench:
         mac_address = self.config["mqttms"]["ms"]["server_mac"]
         if self.config["options"]["interactive"]:
             mac_address = prompt('Enter a MAC address: ', default=mac_address, validator=MACAddressValidator())
-        print(f'Validated MAC Address: {mac_address}')
+        logger.error(f'Using MAC Address: {mac_address}')
         self.config["mqttms"]["ms"]["server_mac"] = mac_address
 
         return True
@@ -88,7 +88,7 @@ class TestBench:
                 logger.info("WiFi credentials successfully cleared")
             else:
                 logger.info("WiFi credentials were not cleared")
-                return
+                # return
 
             payload = self.ms_host.ms_mqtt_ready()
             resp = payload.get("response","")
