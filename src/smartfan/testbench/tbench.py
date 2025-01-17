@@ -53,7 +53,9 @@ class TestBench:
 
         # Replacement o fabove until it is coded with proper hadware BLE/serial module
         # Prompt the user for a MAC address
-        mac_address = prompt('Enter a MAC address: ', default=self.config["mqttms"]["ms"]["server_mac"], validator=MACAddressValidator())
+        mac_address = self.config["mqttms"]["ms"]["server_mac"]
+        if self.config["options"]["interactive"]:
+            mac_address = prompt('Enter a MAC address: ', default=mac_address, validator=MACAddressValidator())
         print(f'Validated MAC Address: {mac_address}')
         self.config["mqttms"]["ms"]["server_mac"] = mac_address
 
@@ -163,7 +165,8 @@ class TestBench:
         serial_separator =  self.config.get("dut").get("serial_separator")
         snstr = idn + serial_separator + serial_date + serial_separator + serialn
 
-        snstr = prompt("Serial number: ", default=snstr)
+        if self.config["options"]["interactive"]:
+            snstr = prompt("Serial number: ", default=snstr)
 
         logger.info(f" S/N: %s",snstr)
 

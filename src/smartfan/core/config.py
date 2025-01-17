@@ -62,7 +62,8 @@ class Config:
         },
         "options": {
             "snonly": False,
-            "dutdelay": 2.0
+            "dutdelay": 2.0,
+            "interactive": True
         }
     }
 
@@ -141,7 +142,8 @@ class Config:
                 "type": "object",
                 "properties": {
                     "snonly": { "type": "boolean" },
-                    "dutdelay": { "type": "number"}
+                    "dutdelay": { "type": "number"},
+                    "interactive": { "type": "boolean" }
                 }
             }
         },
@@ -277,6 +279,8 @@ class Config:
                 self.config['options']['snonly'] = config_cli.snonly
             if config_cli.dutdelay is not None:
                 self.config['options']['dutdelay'] = config_cli.dutdelay
+            if config_cli.interactive is not None:
+                self.config['options']['interactive'] = config_cli.interactive
 
         return self.config
 

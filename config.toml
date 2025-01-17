@@ -31,3 +31,4 @@ motoroff = 1.0
 [options]
 snonly = false
 #dutdelay = 4.0
+interactive = true
