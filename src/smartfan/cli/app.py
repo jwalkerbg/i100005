@@ -41,28 +41,32 @@ def parse_args():
 
     # aplication options & parameters
     # MQTT options
-    parser.add_argument('--mqtt-host', type=str, help='MQTT host to connect to')
-    parser.add_argument('--mqtt-port', type=int, help='MQTT port')
-    parser.add_argument('--mqtt-username', type=str, help='MQTT username')
-    parser.add_argument('--mqtt-password', type=str, help='MQTT password')
-    parser.add_argument('--mqtt-client-id', type=str, help="MQTT Client ID, used by the broker")
-    parser.add_argument("--mqtt-timeout", type=float, help="Timeout to wait connection or other activity in MQTT handler.")
-    parser.add_argument("--mqtt-lp", type=int, dest='long_payload', help="Determines threshold of long payloads. When they are longer that this value, a short string is logged instead of real payloads. --verbose makes real payloads to be logged always.")
+    mqtt_group = parser.add_argument_group('MQTT Options')
+    mqtt_group.add_argument('--mqtt-host', type=str, help='MQTT host to connect to')
+    mqtt_group.add_argument('--mqtt-port', type=int, help='MQTT port')
+    mqtt_group.add_argument('--mqtt-username', type=str, help='MQTT username')
+    mqtt_group.add_argument('--mqtt-password', type=str, help='MQTT password')
+    mqtt_group.add_argument('--mqtt-client-id', type=str, help="MQTT Client ID, used by the broker")
+    mqtt_group.add_argument("--mqtt-timeout", type=float, help="Timeout to wait connection or other activity in MQTT handler.")
+    mqtt_group.add_argument("--mqtt-lp", type=int, dest='long_payload', help="Determines threshold of long payloads. When they are longer that this value, a short string is logged instead of real payloads. --verbose makes real payloads to be logged always.")
 
     # ms protocol
-    parser.add_argument("--ms-client_mac", type=str, dest='ms_client_mac', help="MAC address of the client (master side).")
-    parser.add_argument("--ms-server_mac", type=str, dest='ms_server_mac', help="MAC address of the server (slave side).")
-    parser.add_argument("--ms-cmd-topic", type=str, dest='ms_cmd_topic', help="Template of command topic.")
-    parser.add_argument("--ms-rsp-topic", type=str, dest='ms_rsp_topic', help="Template of response topic.")
-    parser.add_argument("--ms-timeout", type=float, dest='ms_timeout', help="Timeout used in protocol to wait for response.")
+    ms_group = parser.add_argument_group('MS Protocol Options')
+    ms_group.add_argument("--ms-client_mac", type=str, dest='ms_client_mac', help="MAC address of the client (master side).")
+    ms_group.add_argument("--ms-server_mac", type=str, dest='ms_server_mac', help="MAC address of the server (slave side).")
+    ms_group.add_argument("--ms-cmd-topic", type=str, dest='ms_cmd_topic', help="Template of command topic.")
+    ms_group.add_argument("--ms-rsp-topic", type=str, dest='ms_rsp_topic', help="Template of response topic.")
+    ms_group.add_argument("--ms-timeout", type=float, dest='ms_timeout', help="Timeout used in protocol to wait for response.")
 
     # tests
-    parser.add_argument("--motoron", type=float, dest='motoron', help="Time to maintain motor enabled in tests")
-    parser.add_argument("--motoroff", type=float, dest='motoroff', help="Time to maintain motor disabled in tests")
+    tests_group = parser.add_argument_group('Tests Options')
+    tests_group.add_argument("--motoron", type=float, dest='motoron', help="Time to maintain motor enabled in tests")
+    tests_group.add_argument("--motoroff", type=float, dest='motoroff', help="Time to maintain motor disabled in tests")
 
     # operative options
-    parser.add_argument("--sn-only", dest='snonly', action='store_const', const=True, default=False, help="Write only serial number without any tests. Expects device with valid WiFi credentials, connected to the Internet.")
-    parser.add_argument("--dut-delay", type=float, dest='dutdelay', help="Delay after BLE pairing and connecting to MQTT before start of tests driven by MS protocol over MQTT. This time allows DUT to setup WiFi/MQTT connection.")
+    operative_group = parser.add_argument_group('Operative Options')
+    operative_group.add_argument("--sn-only", dest='snonly', action='store_const', const=True, default=False, help="Write only serial number without any tests. Expects device with valid WiFi credentials, connected to the Internet.")
+    operative_group.add_argument("--dut-delay", type=float, dest='dutdelay', help="Delay after BLE pairing and connecting to MQTT before start of tests driven by MS protocol over MQTT. This time allows DUT to setup WiFi/MQTT connection.")
 
     return parser.parse_args()
 
