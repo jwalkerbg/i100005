@@ -32,3 +32,4 @@ motoroff = 1.0
 snonly = false
 #dutdelay = 4.0
 interactive = true
+#nopairing = false

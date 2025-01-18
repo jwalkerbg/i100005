@@ -78,23 +78,23 @@ class TestBench:
 
         self.ms_subscribe()
 
-
         if self.config["options"]["snonly"]:
             testarray = self.snonly
         else:
-            # This is called after succcessful binding and this command must be first one
-            payload = self.ms_host.ms_wificred("*","*")
-            if payload.get("response","") == "OK":
-                logger.info("WiFi credentials successfully cleared")
-            else:
-                logger.info("WiFi credentials were not cleared")
-                # return
+            if not self.config['options']['nopairing']:
+                # This is called after succcessful binding and this command must be first one
+                payload = self.ms_host.ms_wificred("*","*")
+                if payload.get("response","") == "OK":
+                    logger.info("WiFi credentials successfully cleared")
+                else:
+                    logger.info("WiFi credentials were not cleared")
+                    # return
 
-            payload = self.ms_host.ms_mqtt_ready()
-            resp = payload.get("response","")
-            if resp != "OK":
-                logger.error("API_MQTT_READy received answer: {resp}")
-                return
+                payload = self.ms_host.ms_mqtt_ready()
+                resp = payload.get("response","")
+                if resp != "OK":
+                    logger.error("API_MQTT_READY received answer: {resp}")
+                    return
             testarray = self.tests
 
         for test in testarray:

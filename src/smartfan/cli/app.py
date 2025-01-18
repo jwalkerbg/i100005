@@ -73,12 +73,12 @@ def parse_args():
 
     # operative options
     operative_group = parser.add_argument_group('Operative Options')
-    operative_group.add_argument("--sn-only", dest='snonly', action='store_const', const=True, default=False, help="Write only serial number without any tests. Expects device with valid WiFi credentials, connected to the Internet.")
+    operative_group.add_argument("--sn-only", dest='snonly', action='store_const', const=True, default=False, help="Write only serial number without any tests. Expects device with valid WiFi credentials, connected to the Internet. Activates --no-pairing option.")
     operative_group.add_argument("--dut-delay", type=float, dest='dutdelay', help="Delay after BLE pairing and connecting to MQTT before start of tests driven by MS protocol over MQTT. This time allows DUT to setup WiFi/MQTT connection.")
     interactive_group = operative_group.add_mutually_exclusive_group()
     interactive_group.add_argument('--interactive', dest='interactive', action='store_const', const=True, help='Enable interactive mode (default)')
     interactive_group.add_argument('--no-interactive', dest='interactive', action='store_const', const=False, help='Disable interactive mode')
-
+    operative_group.add_argument("--no-pairing", dest='nopairing', action='store_const', const=True, default=False, help="Do not execute paring procedure. Assumes DUT has already valid WiFi credentials.")
 
     return parser.parse_args()
 
@@ -102,6 +102,9 @@ def main():
     # Step 4: Merge default config, config.json, and command-line arguments
     cfg.merge_options(args)
 
+    if cfg.config['options']['snonly']:
+         cfg.config['options']['nopairing'] = True
+
     # Step 5: Run the application with collected configuration
     if cfg.config['metadata']['version']:
         app_version = version("smartfan")
@@ -121,9 +124,10 @@ def run_app(config:Config) -> None:
         tb = TestBench(config.config)
 
         # Step 1) BLE binding, exchange WIFi credentials / MAC address
-        if not tb.ble_binding():
-            logger.error("Cannot bind with server via BLE")
-            return
+        if config.config['options']['nopairing']:
+            if not tb.ble_binding():
+                logger.error("Cannot bind with server via BLE")
+                return
 
         # At this point:
         # Тhe server knows WiFi credentials and connects to MQTT broker
