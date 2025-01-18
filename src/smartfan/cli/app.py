@@ -112,8 +112,6 @@ def main():
 # CLI application main function with collected options & configuration
 def run_app(config:Config) -> None:
 
-    print(f"config = {config.config}")
-
     try:
         logger.info("Running run_app")
         if config.config.get('logging').get('verbose', False):
