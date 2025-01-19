@@ -88,7 +88,7 @@ class TestBench:
                     logger.info("WiFi credentials successfully cleared")
                 else:
                     logger.info("WiFi credentials were not cleared")
-                    # return
+                    return
 
                 payload = self.ms_host.ms_mqtt_ready()
                 resp = payload.get("response","")
