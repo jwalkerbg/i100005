@@ -100,9 +100,17 @@ class TestBench:
         for test in testarray:
             logger.info("")
             logger.info("**** Test %s ****",test[1])
-            test[0]()
+            res = test[0]()
+            if res:
+                logger.info("**** Test %s: PASS",test[1])
+            else:
+                logger.info("**** Test %s: FAIL",test[1])
+            if self.config['options']['stop_if_failed'] and not res:
+                break
 
-    def t_who_am_i(self):
+    # tests
+
+    def t_who_am_i(self) -> bool:
         payload = self.ms_host.ms_who_am_i()
         if payload.get("response","") == "OK":
             jdata = payload.get('data', None)
@@ -110,9 +118,12 @@ class TestBench:
             bdata = bytes.fromhex(jdata)
             unpacked_data = struct.unpack(format_string, bdata)
             logger.info("Device ID: %02x",unpacked_data[0])
+            return True
+        else:
+            return False
 
 
-    def t_version(self):
+    def t_version(self) -> bool:
         payload = self.ms_host.ms_version()
         if payload.get("response","") == "OK":
             jdata = payload.get('data', None)
@@ -122,9 +133,12 @@ class TestBench:
             serial = serial_bytes.decode('ascii').rstrip('\x00')
             logger.info(f"Version: %s",versiondev)
             logger.info("Serial Number: %s",serial)
+            return True
+        else:
+            return False
 
 
-    def t_sensors(self):
+    def t_sensors(self) -> bool:
         payload = self.ms_host.ms_sensors()
         if payload.get("response","") == "OK":
             jdata = payload.get('data', None)
@@ -133,11 +147,13 @@ class TestBench:
             unpacked_data = struct.unpack(format_string, bdata)
             logger.info(f"MSH unpacked_data = {unpacked_data}")
             logger.info(f"\nTemperature: {unpacked_data[0]/100}\nPressure: {unpacked_data[1]/100} hPa\nHumidity: {unpacked_data[2]/1000} %\nGas:{unpacked_data[3]} Ohm\nAmbient light: {unpacked_data[4]}\nSensors: {unpacked_data[5]:x}\nMotor: {unpacked_data[6]:x}\nDevice state: {unpacked_data[7]:x}")
+            return True
         else:
             logger.info("MSH: No valid data received")
+            return False
 
 
-    def t_motor(self):
+    def t_motor(self) -> bool:
         motoron = self.config.get("tests").get("motoron", 3.0)
         motoroff = self.config.get("tests").get("motoroff", 1.0)
         self.ms_host.ms_motor(self.MOT_STOP)
@@ -150,15 +166,17 @@ class TestBench:
         time.sleep(motoron)
         self.ms_host.ms_motor(self.MOT_STOP)
         time.sleep(motoroff)
+        return True
 
-    def t_led(self):
+    def t_led(self) -> bool:
         for _ in range(3):
             self.ms_host.ms_led(1)
             time.sleep(0.5)
             self.ms_host.ms_led(0)
             time.sleep(0.5)
+        return True
 
-    def t_serialn(self):
+    def t_serialn(self) -> bool:
         idn = self.config.get("dut").get("ident")
         serial_date = self.config.get("dut").get("serial_date")
         serialn = self.config.get("dut").get("serialn")
@@ -173,5 +191,7 @@ class TestBench:
         payload = self.ms_host.ms_serial(snstr)
         if payload.get("response","") == "OK":
             logger.info("Serial number is written")
+            return True
         else:
             logger.info("Serial number was not set")
+            return False

@@ -64,7 +64,8 @@ class Config:
             "snonly": False,
             "dutdelay": 2.0,
             "interactive": True,
-            "nopairing": False
+            "nopairing": False,
+            "stop_if_failed": False
         }
     }
 
@@ -145,7 +146,8 @@ class Config:
                     "snonly": { "type": "boolean" },
                     "dutdelay": { "type": "number"},
                     "interactive": { "type": "boolean" },
-                    "nopairing": { "type": "boolean" }
+                    "nopairing": { "type": "boolean" },
+                    "stop_if_failed": { "type": "boolean" }
                 }
             }
         },
@@ -285,6 +287,8 @@ class Config:
                 self.config['options']['interactive'] = config_cli.interactive
             if config_cli.nopairing is not None:
                 self.config['options']['nopairing'] = config_cli.nopairing
+            if config_cli.stop_if_failed is not None:
+                self.config['options']['stop_if_failed'] = config_cli.stop_if_failed
 
         return self.config
 

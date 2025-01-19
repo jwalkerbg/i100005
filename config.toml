@@ -33,3 +33,4 @@ snonly = false
 #dutdelay = 4.0
 interactive = true
 #nopairing = false
+stop_if_failed = true
