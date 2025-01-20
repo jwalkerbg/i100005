@@ -192,7 +192,7 @@ class Config:
             validate(instance=config_file, schema=self.CONFIG_SCHEMA)
         except ValidationError as e:
             logger.warning(f"Configuration validation error in {file_path}: {e}")
-            raise ValueError
+            raise ValueError from e
         except Exception as e:
             logger.error(f"Exception when trying to load {file_path}: {e}")
             raise e
