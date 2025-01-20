@@ -56,7 +56,7 @@ class TestBench:
         mac_address = self.config["mqttms"]["ms"]["server_mac"]
         if self.config["options"]["interactive"]:
             mac_address = prompt('Enter a MAC address: ', default=mac_address, validator=MACAddressValidator())
-        logger.error(f'Using MAC Address: {mac_address}')
+        logger.error("Using MAC Address: %s", mac_address)
         self.config["mqttms"]["ms"]["server_mac"] = mac_address
 
         return True
@@ -119,8 +119,7 @@ class TestBench:
             unpacked_data = struct.unpack(format_string, bdata)
             logger.info("Device ID: %02x",unpacked_data[0])
             return True
-        else:
-            return False
+        return False
 
 
     def t_version(self) -> bool:
@@ -134,8 +133,7 @@ class TestBench:
             logger.info(f"Version: %s",versiondev)
             logger.info("Serial Number: %s",serial)
             return True
-        else:
-            return False
+        return False
 
 
     def t_sensors(self) -> bool:
@@ -148,9 +146,8 @@ class TestBench:
             logger.info(f"MSH unpacked_data = {unpacked_data}")
             logger.info(f"\nTemperature: {unpacked_data[0]/100}\nPressure: {unpacked_data[1]/100} hPa\nHumidity: {unpacked_data[2]/1000} %\nGas:{unpacked_data[3]} Ohm\nAmbient light: {unpacked_data[4]}\nSensors: {unpacked_data[5]:x}\nMotor: {unpacked_data[6]:x}\nDevice state: {unpacked_data[7]:x}")
             return True
-        else:
-            logger.info("MSH: No valid data received")
-            return False
+        logger.info("MSH: No valid data received")
+        return False
 
 
     def t_motor(self) -> bool:
@@ -186,12 +183,12 @@ class TestBench:
         if self.config["options"]["interactive"]:
             snstr = prompt("Serial number: ", default=snstr)
 
-        logger.info(f" S/N: %s",snstr)
+        logger.info(" S/N: %s",snstr)
 
         payload = self.ms_host.ms_serial(snstr)
         if payload.get("response","") == "OK":
             logger.info("Serial number is written")
             return True
-        else:
-            logger.info("Serial number was not set")
-            return False
+
+        logger.info("Serial number was not set")
+        return False
