@@ -19,7 +19,7 @@ class AppMQTTDispatcher(MQTTDispatcher):
 
     def handle_message(self, message: Tuple[str, str]) -> bool:
         if not super().handle_message(message):
-            logger.info(f"handle_message: -t '{message[0]}' -m '{message[1]}'")
+            logger.info("handle_message: -t '%s' -m '%s'", message[0], message[1])
             return True
         return False
 
@@ -104,7 +104,7 @@ def main():
     cfg.merge_options(args)
 
     if cfg.config['options']['snonly']:
-         cfg.config['options']['nopairing'] = True
+        cfg.config['options']['nopairing'] = True
 
     # Step 5: Run the application with collected configuration
     if cfg.config['metadata']['version']:
