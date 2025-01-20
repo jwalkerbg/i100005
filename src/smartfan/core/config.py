@@ -49,8 +49,23 @@ class Config:
                 'timeout': 5.0
             }
         },
+        "dut": {
+            "ident": "999999",
+            "name": "device",
+            "serial_date": "2501",
+            "serialn": "0000001",
+            "serial_separator": "-"
+        },
         "tests": {
-
+            "motoron": 3.0,
+            "motoroff": 1.0
+        },
+        "options": {
+            "snonly": False,
+            "dutdelay": 2.0,
+            "interactive": True,
+            "nopairing": False,
+            "stop_if_failed": False
         }
     }
 
@@ -108,18 +123,35 @@ class Config:
                 "required": ["mqtt", "ms"],
                 "additionalProperties": False
             },
+            "dut" :{
+                "type": "object",
+                "properties": {
+                    "ident": { "type": "string"},
+                    "name": { "typ": "string" },
+                    "serial_date": { "type": "string"},
+                    "serialn": { "type": "string"},
+                    "serial_separator": { "type": "string" }
+                }
+            },
             "tests": {
                 "type": "object",
                 "properties": {
-                    "idn": { "type": "string"},
-                    "serial_date": {"type": "string"},
-                    "serialn": {"type": "string"},
-                    "serial_separator": { "type": "string" }
-                },
-                "required": ["serial_date", "serialn"]
+                    "motoron": { "type": "number" },
+                    "motoroff": { "type": "number" }
+                }
+            },
+            "options": {
+                "type": "object",
+                "properties": {
+                    "snonly": { "type": "boolean" },
+                    "dutdelay": { "type": "number"},
+                    "interactive": { "type": "boolean" },
+                    "nopairing": { "type": "boolean" },
+                    "stop_if_failed": { "type": "boolean" }
+                }
             }
         },
-        "required": ["logging", "mqttms", "tests"],
+        "required": ["logging", "mqttms"],
         "additionalProperties": False
     }
 
@@ -160,7 +192,7 @@ class Config:
             validate(instance=config_file, schema=self.CONFIG_SCHEMA)
         except ValidationError as e:
             logger.warning(f"Configuration validation error in {file_path}: {e}")
-            raise ValueError
+            raise ValueError from e
         except Exception as e:
             logger.error(f"Exception when trying to load {file_path}: {e}")
             raise e
@@ -227,6 +259,36 @@ class Config:
             # Handle general options
             if config_cli.verbose is not None:
                 self.config['logging']['verbose'] = config_cli.verbose
+
+            # dut options
+            if config_cli.dut_ident is not None:
+                self.config['dut']['ident'] = config_cli.dut_ident
+            if config_cli.dut_name is not None:
+                self.config['dut']['name'] = config_cli.dut_name
+            if config_cli.dut_serial_date is not None:
+                self.config['dut']['serial_date'] = config_cli.dut_serial_date
+            if config_cli.dut_serialn is not None:
+                self.config['dut']['serialn'] = config_cli.dut_serialn
+            if config_cli.serial_separator is not None:
+                self.config['dut']['serial_separator'] = config_cli.serial_separator
+
+            # test options
+            if config_cli.motoron is not None:
+                self.config['tests']['motoron'] = config_cli.motoron
+            if config_cli.motoroff is not None:
+                self.config['tests']['motoroff'] = config_cli.motoroff
+
+            # operatione options
+            if config_cli.snonly is not None:
+                self.config['options']['snonly'] = config_cli.snonly
+            if config_cli.dutdelay is not None:
+                self.config['options']['dutdelay'] = config_cli.dutdelay
+            if config_cli.interactive is not None:
+                self.config['options']['interactive'] = config_cli.interactive
+            if config_cli.nopairing is not None:
+                self.config['options']['nopairing'] = config_cli.nopairing
+            if config_cli.stop_if_failed is not None:
+                self.config['options']['stop_if_failed'] = config_cli.stop_if_failed
 
         return self.config
 

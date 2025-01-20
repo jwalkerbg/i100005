@@ -1,24 +1,36 @@
 [mqttms.mqtt]
-host = "broker.emqx.io"
-port = 1883
-username = ""
-password = ""
-client_id = "client_394578"
-timeout = 30.0
-long_payload = 25
+host = "broker.emqx.io"                     # MQTT brokr URI
+port = 1883                                 # port
+username = ""                               # username if must log in
+password = ""                               # password if must log in
+client_id = "client_394578"                 # client ID. Must be uinq for earch smartfan installation
+timeout = 30.0                              # timeout in second to wait for reaction (on connection request, subscription etc)
+long_payload = 25                           # payload lenth threshod. Used in logging.
 
 [mqttms.ms]
-client_mac = "1234567890A3"
-server_mac = "F412FACEF2E8"     # ESP32 module: "F412FAD56AF4"
-cmd_topic = "@/server_mac/CMD/format"
-rsp_topic = "@/client_mac/RSP/format"
+client_mac = "1234567890A3"                 # Used as identifier of this application running on conrete computer
+server_mac = "F412FACEF2E8"                 # Mac address of DUT
+cmd_topic = "@/server_mac/CMD/format"       # template of MS protocol command topic
+rsp_topic = "@/client_mac/RSP/format"       # template of MS protocol response topic
 timeout = 5.0
 
 [logging]
-verbose = false
+verbose = false                 # if true, give more verbose logging
+
+[dut]
+ident = "109380"                # identifier ot DUT brand
+name = "Smart Ventilator"       # Human readable name
+serial_date = "2501"            # year and moth or production
+serialn = "0000001"             # serial number
+serial_separator = "-"          # separator  betwennparts of the serial number
 
 [tests]
-idn = "109380"
-serial_date = "2501"
-serial_separator = "-"
-serialn = "0000001"
+motoron = 3.0           # time to maintain motor in ON state in t_motor test
+motoroff = 1.0          # time to maintain motor in OFF state in t_motor test
+
+[options]
+snonly = false          # send only a serial number to a DUT with valid WiFI credentials
+dutdelay = 2.0          # Delay in seconds after DIT BLE pairing
+interactive = true      # if false, smartfan uses values from the configuration or options and do not ask at command line for conformation
+nopairing = false       # Skip BLE pairing. Useful for testing already paired devices that have valid WiFi Credentials.
+stop_if_failed = true   # stop testing if some test fails.

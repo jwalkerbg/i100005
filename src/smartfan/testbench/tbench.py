@@ -37,6 +37,9 @@ class TestBench:
                 (self.t_led, "Led"),
                 (self.t_serialn, "Serial N")
             ]
+        self.snonly = [
+            (self.t_serialn, "Serial N")
+        ]
 
     def set_ms_host(self, ms_host:MShost):
         self.ms_host = ms_host
@@ -50,8 +53,10 @@ class TestBench:
 
         # Replacement o fabove until it is coded with proper hadware BLE/serial module
         # Prompt the user for a MAC address
-        mac_address = prompt('Enter a MAC address: ', default=self.config["mqttms"]["ms"]["server_mac"], validator=MACAddressValidator())
-        print(f'Validated MAC Address: {mac_address}')
+        mac_address = self.config["mqttms"]["ms"]["server_mac"]
+        if self.config["options"]["interactive"]:
+            mac_address = prompt('Enter a MAC address: ', default=mac_address, validator=MACAddressValidator())
+        logger.error("Using MAC Address: %s", mac_address)
         self.config["mqttms"]["ms"]["server_mac"] = mac_address
 
         return True
@@ -73,20 +78,39 @@ class TestBench:
 
         self.ms_subscribe()
 
-        # This is called after succcessful binding and this command must be first one
+        if self.config["options"]["snonly"]:
+            testarray = self.snonly
+        else:
+            if not self.config['options']['nopairing']:
+                # This is called after succcessful binding and this command must be first one
+                payload = self.ms_host.ms_wificred("*","*")
+                if payload.get("response","") == "OK":
+                    logger.info("WiFi credentials successfully cleared")
+                else:
+                    logger.info("WiFi credentials were not cleared")
+                    return
 
-        payload = self.ms_host.ms_mqtt_ready()
-        resp = payload.get("response","")
-        if resp != "OK":
-            logger.error("API_MQTT_READy received answer: {resp}")
-            return
+                payload = self.ms_host.ms_mqtt_ready()
+                resp = payload.get("response","")
+                if resp != "OK":
+                    logger.error("API_MQTT_READY received answer: {resp}")
+                    return
+            testarray = self.tests
 
-        for test in self.tests:
+        for test in testarray:
             logger.info("")
             logger.info("**** Test %s ****",test[1])
-            test[0]()
+            res = test[0]()
+            if res:
+                logger.info("**** Test %s: PASS",test[1])
+            else:
+                logger.info("**** Test %s: FAIL",test[1])
+            if self.config['options']['stop_if_failed'] and not res:
+                break
 
-    def t_who_am_i(self):
+    # tests
+
+    def t_who_am_i(self) -> bool:
         payload = self.ms_host.ms_who_am_i()
         if payload.get("response","") == "OK":
             jdata = payload.get('data', None)
@@ -94,9 +118,11 @@ class TestBench:
             bdata = bytes.fromhex(jdata)
             unpacked_data = struct.unpack(format_string, bdata)
             logger.info("Device ID: %02x",unpacked_data[0])
+            return True
+        return False
 
 
-    def t_version(self):
+    def t_version(self) -> bool:
         payload = self.ms_host.ms_version()
         if payload.get("response","") == "OK":
             jdata = payload.get('data', None)
@@ -106,9 +132,11 @@ class TestBench:
             serial = serial_bytes.decode('ascii').rstrip('\x00')
             logger.info(f"Version: %s",versiondev)
             logger.info("Serial Number: %s",serial)
+            return True
+        return False
 
 
-    def t_sensors(self):
+    def t_sensors(self) -> bool:
         payload = self.ms_host.ms_sensors()
         if payload.get("response","") == "OK":
             jdata = payload.get('data', None)
@@ -117,42 +145,50 @@ class TestBench:
             unpacked_data = struct.unpack(format_string, bdata)
             logger.info(f"MSH unpacked_data = {unpacked_data}")
             logger.info(f"\nTemperature: {unpacked_data[0]/100}\nPressure: {unpacked_data[1]/100} hPa\nHumidity: {unpacked_data[2]/1000} %\nGas:{unpacked_data[3]} Ohm\nAmbient light: {unpacked_data[4]}\nSensors: {unpacked_data[5]:x}\nMotor: {unpacked_data[6]:x}\nDevice state: {unpacked_data[7]:x}")
-        else:
-            logger.info("MSH: No valid data received")
+            return True
+        logger.info("MSH: No valid data received")
+        return False
 
 
-    def t_motor(self):
+    def t_motor(self) -> bool:
+        motoron = self.config.get("tests").get("motoron", 3.0)
+        motoroff = self.config.get("tests").get("motoroff", 1.0)
         self.ms_host.ms_motor(self.MOT_STOP)
-        time.sleep(1)
+        time.sleep(motoroff)
         self.ms_host.ms_motor(self.MOT_PHASE_SLOW)
-        time.sleep(2)
+        time.sleep(motoron)
         self.ms_host.ms_motor(self.MOT_STOP)
-        time.sleep(1)
+        time.sleep(motoroff)
         self.ms_host.ms_motor(self.MOT_PHASE_FAST)
-        time.sleep(2)
+        time.sleep(motoron)
         self.ms_host.ms_motor(self.MOT_STOP)
-        time.sleep(1)
+        time.sleep(motoroff)
+        return True
 
-    def t_led(self):
+    def t_led(self) -> bool:
         for _ in range(3):
             self.ms_host.ms_led(1)
             time.sleep(0.5)
             self.ms_host.ms_led(0)
             time.sleep(0.5)
+        return True
 
-    def t_serialn(self):
-        idn = self.config.get("tests").get("idn")
-        serial_date = self.config.get("tests").get("serial_date")
-        serialn = self.config.get("tests").get("serialn")
-        serial_separator =  self.config.get("tests").get("serial_separator")
+    def t_serialn(self) -> bool:
+        idn = self.config.get("dut").get("ident")
+        serial_date = self.config.get("dut").get("serial_date")
+        serialn = self.config.get("dut").get("serialn")
+        serial_separator =  self.config.get("dut").get("serial_separator")
         snstr = idn + serial_separator + serial_date + serial_separator + serialn
 
-        snstr = prompt("Serial number: ", default=snstr)
+        if self.config["options"]["interactive"]:
+            snstr = prompt("Serial number: ", default=snstr)
 
-        logger.info(f" S/N: %s",snstr)
+        logger.info(" S/N: %s",snstr)
 
         payload = self.ms_host.ms_serial(snstr)
         if payload.get("response","") == "OK":
             logger.info("Serial number is written")
-        else:
-            logger.info("Serial number was not set")
+            return True
+
+        logger.info("Serial number was not set")
+        return False
