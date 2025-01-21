@@ -46,7 +46,7 @@ smartfan = "smartfan.cli.app:main"
 
 # Definitions, specific for this project.
 [tool.build.config]
-extensions_path = "src/extensions"
+extensions_path = "src/smartfan/extensions"
 include_dirs = ["src/include"]
 libraries = []
 build_log = true
