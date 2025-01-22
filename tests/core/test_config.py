@@ -1,3 +1,4 @@
+import sys
 import pytest
 import tomllib
 import argparse
@@ -7,6 +8,12 @@ from smartfan import core
 #from core import config
 #from config import Config
 #from smartfan.logger import getAppLogger
+
+# Check Python version at runtime
+if sys.version_info >= (3, 11):
+    import tomllib as toml  # Use the built-in tomllib for Python 3.11+
+else:
+    import tomli as toml # Use the external tomli for Python 3.7 to 3.10
 
 class TestConfig:
 
@@ -23,7 +30,7 @@ class TestConfig:
         assert config_instance.config == expected_config
 
     @patch('smartfan.core.config.open', new_callable=mock_open, read_data=b'{"parameters": {"param1": 10}}')
-    @patch('smartfan.core.config.tomllib.load')
+    @patch('smartfan.core.config.toml.load')
     def test_load_toml_success(self, mock_tomli_load, mock_open, config_instance):
         """
         Test that a valid TOML file is loaded correctly.
@@ -47,9 +54,9 @@ class TestConfig:
     def test_load_config_file_invalid_syntax(self, config_instance):
         # Mock the open and tomllib.load to simulate invalid TOML syntax
         with patch('smartfan.core.config.open', new_callable=mock_open, read_data=b'invalid_toml_data'):
-            with patch('smartfan.core.config.tomllib.load', side_effect=tomllib.TOMLDecodeError("Invalid TOML", "", 0)):
+            with patch('smartfan.core.config.toml.load', side_effect=tomllib.TOMLDecodeError("Invalid TOML", "", 0)):
                 # Use pytest.raises to check if the appropriate exception is raised
-                with pytest.raises(tomllib.TOMLDecodeError):
+                with pytest.raises(toml.TOMLDecodeError):
                     config_instance.load_config_file(file_path='invalid_config.toml')
 
     def test_load_config_file_with_empty_name(self, config_instance):
@@ -110,7 +117,7 @@ class TestConfig:
             'metadata': { 'version': False }
         }
         config_instance.config = config_file  # Simulate loaded config
-        merged_config = config_instance.merge_options(config_file, None)
+        merged_config = config_instance.merge_options(None)
 
         expected_config = {
             'parameters': {'param1': 1, 'param2': 2},

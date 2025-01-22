@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "smartfan"
-version = "2.2.0"
+version = "2.2.1"
 description = "CLI for working with smart fans"
 readme = "README.md"
 authors = ["Ivan Cenov <i_cenov@botevgrad.com>"]
@@ -46,7 +46,7 @@ smartfan = "smartfan.cli.app:main"
 
 # Definitions, specific for this project.
 [tool.build.config]
-extensions_path = "src/extensions"
+extensions_path = "src/smartfan/extensions"
 include_dirs = ["src/include"]
 libraries = []
 build_log = true
