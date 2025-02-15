@@ -40,6 +40,9 @@ class TestBench:
         self.snonly = [
             (self.t_serialn, "Serial N")
         ]
+        self.monitor = [
+            (self.t_monitor, "Monitor")
+        ]
 
     def set_ms_host(self, ms_host:MShost):
         self.ms_host = ms_host
@@ -78,24 +81,28 @@ class TestBench:
 
         self.ms_subscribe()
 
-        if self.config["options"]["snonly"]:
-            testarray = self.snonly
-        else:
-            if not self.config['options']['nopairing']:
-                # This is called after succcessful binding and this command must be first one
-                payload = self.ms_host.ms_wificred("*","*")
-                if payload.get("response","") == "OK":
-                    logger.info("WiFi credentials successfully cleared")
-                else:
-                    logger.info("WiFi credentials were not cleared")
-                    return
+        match self.config["options"]["mode"]:
+            case "snonly":
+                testarray = self.snonly
+            case "monitor":
+                testarray = self.monitor
+            case "testbench":
+                testarray = self.tests
 
-                payload = self.ms_host.ms_mqtt_ready()
-                resp = payload.get("response","")
-                if resp != "OK":
-                    logger.error("API_MQTT_READY received answer: {resp}")
-                    return
-            testarray = self.tests
+        if not self.config['options']['nopairing']:
+            # This is called after succcessful binding and this command must be first one
+            payload = self.ms_host.ms_wificred("*","*")
+            if payload.get("response","") == "OK":
+                logger.info("WiFi credentials successfully cleared")
+            else:
+                logger.info("WiFi credentials were not cleared")
+                return
+
+            payload = self.ms_host.ms_mqtt_ready()
+            resp = payload.get("response","")
+            if resp != "OK":
+                logger.error("API_MQTT_READY received answer: {resp}")
+                return
 
         for test in testarray:
             logger.info("")
@@ -192,3 +199,12 @@ class TestBench:
 
         logger.info("Serial number was not set")
         return False
+
+    def t_monitor(self):
+        logger.info("Press Ctrl+C to stop monitoring")
+        #logger.setLevel(logging.WARNING)
+        while True:
+            self.t_sensors()
+            time.sleep(1)
+
+        return True

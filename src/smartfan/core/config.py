@@ -61,7 +61,7 @@ class Config:
             "motoroff": 1.0
         },
         "options": {
-            "snonly": False,
+            "mode": "testbench",
             "dutdelay": 2.0,
             "interactive": True,
             "nopairing": False,
@@ -143,7 +143,10 @@ class Config:
             "options": {
                 "type": "object",
                 "properties": {
-                    "snonly": { "type": "boolean" },
+                    "mode": {
+                        "type": "string",
+                        "enum": ["testbench", "snonly", "monitor"]
+                    },
                     "dutdelay": { "type": "number"},
                     "interactive": { "type": "boolean" },
                     "nopairing": { "type": "boolean" },
@@ -279,8 +282,8 @@ class Config:
                 self.config['tests']['motoroff'] = config_cli.motoroff
 
             # operatione options
-            if config_cli.snonly is not None:
-                self.config['options']['snonly'] = config_cli.snonly
+            if config_cli.mode is not None:
+                self.config['options']['mode'] = config_cli.mode
             if config_cli.dutdelay is not None:
                 self.config['options']['dutdelay'] = config_cli.dutdelay
             if config_cli.interactive is not None:

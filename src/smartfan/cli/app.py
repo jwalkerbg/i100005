@@ -23,6 +23,8 @@ class AppMQTTDispatcher(MQTTDispatcher):
             return True
         return False
 
+valid_modes = ['testbench', 'monitor', 'snonly']
+
 def parse_args():
     """Parse command-line arguments, including nested options for mqtt and MS Protocol."""
     parser = argparse.ArgumentParser(description='Smartfan CLI application')
@@ -73,7 +75,7 @@ def parse_args():
 
     # operative options
     operative_group = parser.add_argument_group('Operative Options')
-    operative_group.add_argument("--sn-only", dest='snonly', action='store_const', const=True, help="Write only serial number without any tests. Expects device with valid WiFi credentials, connected to the Internet. Activates --no-pairing option.")
+    operative_group.add_argument('--mode', type=str, dest='mode', choices=valid_modes, help='Select mode of operation') # testbench, monitor, sn-only
     operative_group.add_argument("--dut-delay", type=float, dest='dutdelay', help="Delay after BLE pairing and connecting to MQTT before start of tests driven by MS protocol over MQTT. This time allows DUT to setup WiFi/MQTT connection.")
     interactive_group = operative_group.add_mutually_exclusive_group()
     interactive_group.add_argument('--interactive', dest='interactive', action='store_const', const=True, help='Enable interactive mode (default)')
@@ -102,9 +104,6 @@ def main():
 
     # Step 4: Merge default config, config.json, and command-line arguments
     cfg.merge_options(args)
-
-    if cfg.config['options']['snonly']:
-        cfg.config['options']['nopairing'] = True
 
     # Step 5: Run the application with collected configuration
     if cfg.config['metadata']['version']:
