@@ -267,7 +267,7 @@ class TestBench:
         print(f"\033[KAmbient light: {light}")
         print(f'\033[KSensors: {sensors:x}: Ambient light: {"Active" if sensors & self.SEN_AMBIENT else "Inactive"}, Gas: { "Active" if sensors & self.SEN_AIR else "Inactive" }, Humidity: { "Active" if sensors & self.SEN_HUMIDITY else "Inactive" }')
         print(f'\033[KMotor: {motor:x}: Motor: {"Active" if motor & self.MOT_RUNNING else "Inactive"}, Phase: { "Fast" if motor & self.MOT_PHASE_FAST else "Slow" }')
-        print(f"\033[KDevice state: {state:x}: Ready: { 'Yes' if (state & self.DEV_STATE_MASK) == self.DEV_STATE_READY else 'No' }, Normal: { 'Yes' if (state & self.DEV_STATE_MASK) == self.DEV_STATE_NORMAL else 'No' }, Forced: { 'Yes' if (state & self.DEV_STATE_MASK) == self.DEV_STATE_FORCED else 'No' }, Local: { 'Yes' if state & self.DEV_STATE_LOCAL else 'No' }, WiFi: { 'Connected' if state & self.DEV_WIFI_CONNECTED else 'Disconnected' }, MQTT: { 'Subscribed' if state & self.DEV_MQTT_SUBSCRIBED else 'Not subscribed' }')")
+        print(f"\033[KDevice state: {state:x}: Ready: { 'Yes' if (state & self.DEV_STATE_MASK) == self.DEV_STATE_READY else 'No' }, Normal: { 'Yes' if (state & self.DEV_STATE_MASK) == self.DEV_STATE_NORMAL else 'No' }, Forced: { 'Yes' if (state & self.DEV_STATE_MASK) == self.DEV_STATE_FORCED else 'No' }, Local: { 'Yes' if state & self.DEV_STATE_LOCAL else 'No' }, WiFi: { 'Connected' if state & self.DEV_WIFI_CONNECTED else 'Disconnected' }, MQTT: { 'Subscribed' if state & self.DEV_MQTT_SUBSCRIBED else 'Not subscribed' })")
 
         return 8
 
