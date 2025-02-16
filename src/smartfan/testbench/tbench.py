@@ -3,6 +3,7 @@
 import time
 import struct
 import re
+import logging
 from prompt_toolkit import prompt
 from prompt_toolkit.validation import Validator, ValidationError
 
@@ -23,9 +24,22 @@ class MACAddressValidator(Validator):
 
 
 class TestBench:
+    MOT_RUNNING = 1
     MOT_PHASE_FAST = 4
     MOT_PHASE_SLOW = 6
     MOT_STOP = 0
+
+    SEN_HUMIDITY = 1
+    SEN_AIR = 2
+    SEN_AMBIENT = 4
+
+    DEV_STATE_MASK = 0x07
+    DEV_STATE_READY = 0x00
+    DEV_STATE_NORMAL = 0x01
+    DEV_STATE_FORCED = 0x02
+    DEV_STATE_LOCAL = 0x08
+    DEV_WIFI_CONNECTED = 0x10
+    DEV_MQTT_SUBSCRIBED = 0x20
 
     def __init__(self, config: dict):
         self.config = config
@@ -144,14 +158,10 @@ class TestBench:
 
 
     def t_sensors(self) -> bool:
-        payload = self.ms_host.ms_sensors()
-        if payload.get("response","") == "OK":
-            jdata = payload.get('data', None)
-            format_string = '<hIIIHBBB'
-            bdata = bytes.fromhex(jdata)
-            unpacked_data = struct.unpack(format_string, bdata)
-            logger.info(f"MSH unpacked_data = {unpacked_data}")
-            logger.info(f"\nTemperature: {unpacked_data[0]/100}\nPressure: {unpacked_data[1]/100} hPa\nHumidity: {unpacked_data[2]/1000} %\nGas:{unpacked_data[3]} Ohm\nAmbient light: {unpacked_data[4]}\nSensors: {unpacked_data[5]:x}\nMotor: {unpacked_data[6]:x}\nDevice state: {unpacked_data[7]:x}")
+        sensor_data = self.read_sensors()
+        if sensor_data:
+            logger.info(f"MSH sensor_data = {sensor_data}")
+            self.print_sensor_data(sensor_data)
             return True
         logger.info("MSH: No valid data received")
         return False
@@ -202,9 +212,63 @@ class TestBench:
 
     def t_monitor(self):
         logger.info("Press Ctrl+C to stop monitoring")
-        #logger.setLevel(logging.WARNING)
-        while True:
-            self.t_sensors()
-            time.sleep(1)
+        logger.setLevel(logging.WARNING)
+        logging.getLogger("smartfan.core.ms_host").setLevel(logging.WARNING)
+        logging.getLogger("mqttms").setLevel(logging.WARNING)
+        print('\n')
+        try:
+            count = 0
+            lines = 0
+            monitor_loops = self.config["options"]["monitor_loops"]
+            while True:
+                print(f"Monitoring loop: {count + 1}")
+                lines = 1
+                sensor_data = self.read_sensors()
+                if sensor_data:
+                    lines += self.print_sensor_data(sensor_data)
+                else:
+                    print("No valid data received")
+                    lines += 1
+
+                count += 1
+                if monitor_loops != 0 and count >= monitor_loops:
+                    break
+
+                time.sleep(self.config["options"]["monitor_delay"])
+                print(f"\033[{lines}A", end="", flush=True)
+        except KeyboardInterrupt as e   :
+            raise e
+        finally:
+            logger.setLevel(logging.INFO)
+            logging.getLogger("smartfan.core.ms_host").setLevel(logging.INFO)
+            logging.getLogger("mqttms").setLevel(logging.INFO)
+            print('')
+            logger.info("Monitoring stopped")
 
         return True
+
+    def read_sensors(self):
+        payload = self.ms_host.ms_sensors()
+        if payload.get("response","") == "OK":
+            jdata = payload.get('data', None)
+            format_string = '<hIIIHBBB'
+            bdata = bytes.fromhex(jdata)
+            unpacked_data = struct.unpack(format_string, bdata)
+            return unpacked_data
+        return None
+
+    def print_sensor_data(self, sensor_data):
+        temperature, pressure, humidity, gas, light, sensors, motor, state = sensor_data
+
+        print(f"\033[KTemperature: {temperature/100:.2f} °C")
+        print(f"\033[KPressure: {pressure/100:.2f} hPa")
+        print(f"\033[KHumidity: {humidity/1000:.2f} %")
+        print(f"\033[KGas: {gas} Ohm")
+        print(f"\033[KAmbient light: {light}")
+        print(f'\033[KSensors: {sensors:x}: Ambient light: {"Active" if sensors & self.SEN_AMBIENT else "Inactive"}, Gas: { "Active" if sensors & self.SEN_AIR else "Inactive" }, Humidity: { "Active" if sensors & self.SEN_HUMIDITY else "Inactive" }')
+        print(f'\033[KMotor: {motor:x}: Motor: {"Active" if motor & self.MOT_RUNNING else "Inactive"}, Phase: { "Fast" if motor & self.MOT_PHASE_FAST else "Slow" }')
+        print(f"\033[KDevice state: {state:x}: Ready: { 'Yes' if (state & self.DEV_STATE_MASK) == self.DEV_STATE_READY else 'No' }, Normal: { 'Yes' if (state & self.DEV_STATE_MASK) == self.DEV_STATE_NORMAL else 'No' }, Forced: { 'Yes' if (state & self.DEV_STATE_MASK) == self.DEV_STATE_FORCED else 'No' }, Local: { 'Yes' if state & self.DEV_STATE_LOCAL else 'No' }, WiFi: { 'Connected' if state & self.DEV_WIFI_CONNECTED else 'Disconnected' }, MQTT: { 'Subscribed' if state & self.DEV_MQTT_SUBSCRIBED else 'Not subscribed' }')")
+
+        return 8
+
+# testbench/tbench.py
