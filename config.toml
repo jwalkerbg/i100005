@@ -29,7 +29,9 @@ motoron = 3.0           # time to maintain motor in ON state in t_motor test
 motoroff = 1.0          # time to maintain motor in OFF state in t_motor test
 
 [options]
-snonly = false          # send only a serial number to a DUT with valid WiFI credentials
+mode = "testbench"      # select operational mode ("testbench", "snonly", "monitor")
+monitor_delay = 2.0     # interval to refresh data
+monitor_loops = 10      # how many loops to execute monitor. 0 means endless
 dutdelay = 2.0          # Delay in seconds after DIT BLE pairing
 interactive = true      # if false, smartfan uses values from the configuration or options and do not ask at command line for conformation
 nopairing = false       # Skip BLE pairing. Useful for testing already paired devices that have valid WiFi Credentials.

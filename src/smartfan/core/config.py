@@ -61,7 +61,9 @@ class Config:
             "motoroff": 1.0
         },
         "options": {
-            "snonly": False,
+            "mode": "testbench",
+            "monitor_delay": 2.0,
+            "monitor_loops": 10,
             "dutdelay": 2.0,
             "interactive": True,
             "nopairing": False,
@@ -143,7 +145,18 @@ class Config:
             "options": {
                 "type": "object",
                 "properties": {
-                    "snonly": { "type": "boolean" },
+                    "mode": {
+                        "type": "string",
+                        "enum": ["testbench", "snonly", "monitor"]
+                    },
+                    "monitor_delay": {
+                        "type": "number",
+                        "minimum": 0.1,
+                    },
+                    "monitor_loops": {
+                        "type": "integer",
+                        "minimum": 0,
+                    },
                     "dutdelay": { "type": "number"},
                     "interactive": { "type": "boolean" },
                     "nopairing": { "type": "boolean" },
@@ -279,8 +292,12 @@ class Config:
                 self.config['tests']['motoroff'] = config_cli.motoroff
 
             # operatione options
-            if config_cli.snonly is not None:
-                self.config['options']['snonly'] = config_cli.snonly
+            if config_cli.mode is not None:
+                self.config['options']['mode'] = config_cli.mode
+            if config_cli.monitor_delay is not None:
+                self.config['options']['monitor_delay'] = config_cli.monitor_delay
+            if config_cli.monitor_loops is not None:
+                self.config['options']['monitor_loops'] = config_cli.monitor_loops
             if config_cli.dutdelay is not None:
                 self.config['options']['dutdelay'] = config_cli.dutdelay
             if config_cli.interactive is not None:
