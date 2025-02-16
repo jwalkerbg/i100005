@@ -73,7 +73,7 @@ class TestBench:
         mac_address = self.config["mqttms"]["ms"]["server_mac"]
         if self.config["options"]["interactive"]:
             mac_address = prompt('Enter a MAC address: ', default=mac_address, validator=MACAddressValidator())
-        logger.error("Using MAC Address: %s", mac_address)
+        logger.info("Using MAC Address: %s", mac_address)
         self.config["mqttms"]["ms"]["server_mac"] = mac_address
 
         return True
