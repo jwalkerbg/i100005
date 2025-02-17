@@ -83,6 +83,7 @@ def parse_args():
     interactive_group.add_argument('--interactive', dest='interactive', action='store_const', const=True, help='Enable interactive mode (default)')
     interactive_group.add_argument('--no-interactive', dest='interactive', action='store_const', const=False, help='Disable interactive mode')
     operative_group.add_argument("--no-pairing", dest='nopairing', action='store_const', const=True, help="Do not execute pairing procedure. Assumes DUT has already valid WiFi credentials.")
+    operative_group.add_argument("--no-reset-wifi", dest='noresetwifi', action='store_const', const=True, help="Do not reset WiFi credentials on the DUT")
     operative_group.add_argument("--stop-if-failed", dest='stop_if_failed', action='store_const', const=True, help="Stop execution of tests if current test failed")
 
     return parser.parse_args()

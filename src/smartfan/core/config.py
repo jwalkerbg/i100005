@@ -67,6 +67,7 @@ class Config:
             "dutdelay": 2.0,
             "interactive": True,
             "nopairing": False,
+            "noresetwifi": False,
             "stop_if_failed": False
         }
     }
@@ -160,6 +161,7 @@ class Config:
                     "dutdelay": { "type": "number"},
                     "interactive": { "type": "boolean" },
                     "nopairing": { "type": "boolean" },
+                    "noresetwifi": { "type": "boolean" },
                     "stop_if_failed": { "type": "boolean" }
                 }
             }
@@ -304,6 +306,8 @@ class Config:
                 self.config['options']['interactive'] = config_cli.interactive
             if config_cli.nopairing is not None:
                 self.config['options']['nopairing'] = config_cli.nopairing
+            if config_cli.noresetwifi is not None:
+                self.config['options']['noresetwifi'] = config_cli.noresetwifi
             if config_cli.stop_if_failed is not None:
                 self.config['options']['stop_if_failed'] = config_cli.stop_if_failed
 
