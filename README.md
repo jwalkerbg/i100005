@@ -39,10 +39,33 @@ Changing configugation and behvior is made in configuration file (config.toml) o
 
 ### Configuration file.
 
-Configuration file replicates default configuration and freely can be altered so as to adapt to concrete environment. It uses ```toml``` format.Option names in it are self descriptive. Comments are permitted.
+Configuration file replicates default configuration and freely can be altered so as to adapt to concrete environment. It uses ```toml``` format. Option names in it are self descriptive. Comments are permitted.
 
 ### Command-line options.
 
-Command line options alre 'last chance' to modify behavior of the application. The have precedence over the configuration file. They are useful in batnch processing, when each device under test has its own data - par example MAC address or serial number.
+Command line options are 'last chance' to modify behavior of the application. The have precedence over the configuration file. They are useful in batnch processing, when each device under test has its own data - par example MAC address or serial number.
 
+```smartfan --help``` show all available options with help abput them.
+
+## Operational modes
+
+There are three operational modes:
+
+* testbench - this mode executes sequentaly provided set of tests on Device Under Test (DUT)
+* snonly - this mode just stotes serial number into the DUT
+* monitor - this mode is used to monitor device state contnuously
+
+`smartfan` can be in one of the three modes. The election is made by the option `--mode`, followed by one of above keywords.
+
+### Testbench
+
+This mode executes series of tests that prove DUT functionality.
+
+### Snonly
+
+This mode is used to set a serial numbr to already tested device that has valid WiFi credentials. Sometims there may be need to change the serial number, or the DUT is tested other ways
+
+### Monitor
+
+This mode executes repatedly `API_SENSORS` command and prints its results in user friendly format omn the screen. It can loop endlessly or for given number of loops. It can be terminated prematurely by pressing Ctrl-C.
 
