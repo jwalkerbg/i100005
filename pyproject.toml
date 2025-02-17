@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "smartfan"
-version = "2.3.0"
+version = "2.3.1"
 description = "CLI for working with smart fans"
 readme = "README.md"
 authors = ["Ivan Cenov <i_cenov@botevgrad.com>"]
