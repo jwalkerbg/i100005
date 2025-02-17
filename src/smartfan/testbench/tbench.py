@@ -46,6 +46,7 @@ class TestBench:
         self.tests = [
                 (self.t_who_am_i, "Who Am I" ),
                 (self.t_version, "Version" ),
+                (self.t_testmode, "Test Mode" ),
                 (self.t_sensors, "Sensors" ),
                 (self.t_motor, "Motor" ),
                 (self.t_led, "Led"),
@@ -154,6 +155,15 @@ class TestBench:
             logger.info(f"Version: %s",versiondev)
             logger.info("Serial Number: %s",serial)
             return True
+        return False
+
+
+    def t_testmode(self) -> bool:
+        payload = self.ms_host.ms_testmode()
+        if payload.get("response","") == "OK":
+            logger.info("Test mode is set")
+            return True
+        logger.info("Test mode was not set")
         return False
 
 
