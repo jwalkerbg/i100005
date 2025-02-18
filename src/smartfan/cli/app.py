@@ -23,7 +23,7 @@ class AppMQTTDispatcher(MQTTDispatcher):
             return True
         return False
 
-valid_modes = ['testbench', 'monitor', 'snonly']
+valid_modes = ['testbench', 'monitor', 'snonly', 'reset-wifi']
 
 def parse_args():
     """Parse command-line arguments, including nested options for mqtt and MS Protocol."""
@@ -107,6 +107,9 @@ def main():
 
     # Step 4: Merge default config, config.json, and command-line arguments
     cfg.merge_options(args)
+
+    if cfg.config['options']['mode'] == 'reset-wifi':
+        cfg.config['options']['noresetwifi'] = False
 
     # Step 5: Run the application with collected configuration
     if cfg.config['metadata']['version']:

@@ -59,6 +59,8 @@ class TestBench:
             (self.t_monitor, "Monitor")
         ]
 
+        self.resetwifi = [ ]
+
     def set_ms_host(self, ms_host:MShost):
         self.ms_host = ms_host
 
@@ -103,15 +105,14 @@ class TestBench:
                 testarray = self.monitor
             case "testbench":
                 testarray = self.tests
+            case "reset-wifi":
+                testarray = self.resetwifi
 
         if not self.config['options']['nopairing']:
             # This is called after succcessful binding and this command must be first one
+            # to be sent to the server before API_MQTT_READY while the window for it open.
             if not self.config['options']['noresetwifi']:
-                payload = self.ms_host.ms_wificred("*","*")
-                if payload.get("response","") == "OK":
-                    logger.info("WiFi credentials successfully cleared")
-                else:
-                    logger.info("WiFi credentials were not cleared")
+                if not self.reset_wifi_credentials():
                     return
 
             payload = self.ms_host.ms_mqtt_ready()
@@ -130,6 +131,16 @@ class TestBench:
                 logger.info("**** Test %s: FAIL",test[1])
             if self.config['options']['stop_if_failed'] and not res:
                 break
+
+
+    def reset_wifi_credentials(self) -> bool:
+        payload = self.ms_host.ms_wificred("*","*")
+        if payload.get("response","") == "OK":
+            logger.info("WiFi credentials successfully cleared")
+            return True
+        logger.info("WiFi credentials were not cleared")
+        return False
+
 
     # tests
 
@@ -221,6 +232,7 @@ class TestBench:
         logger.info("Serial number was not set")
         return False
 
+
     def t_monitor(self):
         logger.info("Press Ctrl+C to stop monitoring")
         logger.setLevel(logging.WARNING)
@@ -258,6 +270,7 @@ class TestBench:
 
         return True
 
+
     def read_sensors(self):
         payload = self.ms_host.ms_sensors()
         if payload.get("response","") == "OK":
@@ -267,6 +280,7 @@ class TestBench:
             unpacked_data = struct.unpack(format_string, bdata)
             return unpacked_data
         return None
+
 
     def print_sensor_data(self, sensor_data):
         temperature, pressure, humidity, gas, light, sensors, motor, state = sensor_data
