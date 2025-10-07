@@ -54,8 +54,8 @@ def parse_args():
 
     # ms protocol
     ms_group = parser.add_argument_group('MS Protocol Options')
-    ms_group.add_argument("--ms-client_mac", type=str, dest='ms_client_mac', help="MAC address of the client (master side).")
-    ms_group.add_argument("--ms-server_mac", type=str, dest='ms_server_mac', help="MAC address of the server (slave side).")
+    ms_group.add_argument("--ms-client_uuid", type=str, dest='ms_client_uuid', help="UUID of the client (master side).")
+    ms_group.add_argument("--ms-server_uuid", type=str, dest='ms_server_uuid', help="UUID of the server (slave side).")
     ms_group.add_argument("--ms-cmd-topic", type=str, dest='ms_cmd_topic', help="Template of command topic.")
     ms_group.add_argument("--ms-rsp-topic", type=str, dest='ms_rsp_topic', help="Template of response topic.")
     ms_group.add_argument("--ms-timeout", type=float, dest='ms_timeout', help="Timeout used in protocol to wait for response.")

@@ -42,10 +42,10 @@ class Config:
                 "long_payload": 25
             },
             'ms': {
-                'client_mac': '1234567890AB',
-                'server_mac': '112233445566',
-                'cmd_topic': '@/server_mac/CMD/format',
-                'rsp_topic': '@/client_mac/RSP/format',
+                'client_uuid': 'e6f87d77-4216-4be1-ab83-b5fa6792b747',
+                'server_uuid': '4fdc0d1f-2421-4b5b-975b-9b4d0a08d712',
+                'cmd_topic': '@/server_uuid/CMD/format',
+                'rsp_topic': '@/client_uuid/RSP/format',
                 'timeout': 5.0
             }
         },
@@ -114,13 +114,13 @@ class Config:
                     "ms": {
                         "type": "object",
                         "properties": {
-                            "client_mac": {"type": "string"},
-                            "server_mac": {"type": "string"},
+                            "client_uuid": {"type": "string"},
+                            "server_uuid": {"type": "string"},
                             "cmd_topic": {"type": "string"},
                             "rsp_topic": {"type": "string"},
                             "timeout": {"type": "number"}
                         },
-                        "required": ["client_mac", "server_mac", "cmd_topic", "rsp_topic", "timeout"]
+                        "required": ["client_uuid", "server_uuid", "cmd_topic", "rsp_topic", "timeout"]
                     }
                 },
                 "required": ["mqtt", "ms"],
@@ -258,10 +258,10 @@ class Config:
                 self.config['mqttms']['mqtt']['long_payload'] = config_cli.long_payload
 
             # handle ms protocol overrides
-            if config_cli.ms_client_mac:
-                self.config['mqttms']['ms']['client_mac'] = config_cli.ms_client_mac
-            if config_cli.ms_server_mac:
-                self.config['mqttms']['ms']['server_mac'] = config_cli.ms_server_mac
+            if config_cli.ms_client_uuid:
+                self.config['mqttms']['ms']['client_uuid'] = config_cli.ms_client_uuid
+            if config_cli.ms_server_uuid:
+                self.config['mqttms']['ms']['server_uuid'] = config_cli.ms_server_uuid
             if config_cli.ms_cmd_topic:
                 self.config['mqttms']['ms']['cmd_topic'] = config_cli.ms_cmd_topic
             if config_cli.ms_rsp_topic:
@@ -329,8 +329,8 @@ class Config:
 
         ms_config = self.config['mqttms']['ms']
         logger.info("MS Configuration")
-        logger.info("  Client (master) MAC: %s",ms_config.get('client_mac', 'N/A'))
-        logger.info("  Server (slave) MAC:  %s",ms_config.get('server_mac', 'N/A'))
+        logger.info("  Client (master) UUID: %s",ms_config.get('client_uuid', 'N/A'))
+        logger.info("  Server (slave) UUID:  %s",ms_config.get('server_uuid', 'N/A'))
         logger.info("  Command topic:  %s",ms_config.get('cmd_topic', 'N/A'))
         logger.info("  Response topic: %s",ms_config.get('rsp_topic', 'N/A'))
         logger.info("  MS protocol timeout: %f",ms_config.get('timeout', 'N/A'))

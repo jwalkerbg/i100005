@@ -12,16 +12,23 @@ from smartfan.core import MShost
 
 logger = get_app_logger(__name__)
 
-class MACAddressValidator(Validator):
-    def validate(self, document):
-        # Regular expression for a valid MAC address (12 hex characters)
-        mac_regex = r'[0-9a-fA-F]{12}'
-        if not re.fullmatch(mac_regex, document.text):
-            raise ValidationError(
-                message='Invalid MAC address. Please enter exactly 12 hex characters (0-9, a-f, A-F) without symbols.',
-                cursor_position=len(document.text)  # Move cursor to the end
-            )
+class UUIDv4Validator(Validator):
+    # Precompiled regex for UUID v4 (case-insensitive)
+    uuid4_regex = re.compile(
+        r'^[0-9a-fA-F]{8}-'
+        r'[0-9a-fA-F]{4}-'
+        r'4[0-9a-fA-F]{3}-'
+        r'[89abAB][0-9a-fA-F]{3}-'
+        r'[0-9a-fA-F]{12}$'
+    )
 
+    def validate(self, document):
+        text = document.text.strip()
+        if not self.uuid4_regex.fullmatch(text):
+            raise ValidationError(
+                message='Invalid UUIDv4. Expected format: 8-4-4-4-12 hex characters (version 4 only).',
+                cursor_position=len(document.text)
+            )
 
 class TestBench:
     MOT_RUNNING = 1
@@ -71,13 +78,13 @@ class TestBench:
         # subscribe MQTT
         # API_MQTT_READY
 
-        # Replacement o fabove until it is coded with proper hadware BLE/serial module
-        # Prompt the user for a MAC address
-        mac_address = self.config["mqttms"]["ms"]["server_mac"]
+        # Replacement of above until it is coded with proper hardware BLE/serial module
+        # Prompt the user for a UUID input with validation
+        uuid = self.config["mqttms"]["ms"]["server_uuid"]
         if self.config["options"]["interactive"]:
-            mac_address = prompt('Enter a MAC address: ', default=mac_address, validator=MACAddressValidator())
-        logger.info("Using MAC Address: %s", mac_address)
-        self.config["mqttms"]["ms"]["server_mac"] = mac_address
+            uuid = prompt('Enter a UUID: ', default=uuid, validator=UUIDv4Validator())
+        logger.info("Using UUID: %s", uuid)
+        self.config["mqttms"]["ms"]["server_uuid"] = uuid
 
         return True
 

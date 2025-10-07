@@ -8,10 +8,10 @@ timeout = 30.0                              # timeout in second to wait for reac
 long_payload = 25                           # payload lenth threshod. Used in logging.
 
 [mqttms.ms]
-client_mac = "1234567890A3"                 # Used as identifier of this application running on conrete computer
-server_mac = "F412FACEF2E8"                 # Mac address of DUT
-cmd_topic = "@/server_mac/CMD/format"       # template of MS protocol command topic
-rsp_topic = "@/client_mac/RSP/format"       # template of MS protocol response topic
+client_uuid = "e6f87d77-4216-4be1-ab83-b5fa6792b747"    # Used as identifier of this application running on concrete computer
+server_uuid = "4fdc0d1f-2421-4b5b-975b-9b4d0a08d712"    # UUID of DUT
+cmd_topic = "@/server_uuid/CMD/format"       # template of MS protocol command topic
+rsp_topic = "@/server_uuid/RSP/format"       # template of MS protocol response topic
 timeout = 5.0
 
 [logging]
