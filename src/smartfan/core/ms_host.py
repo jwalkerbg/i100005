@@ -45,6 +45,18 @@ class MShost:
         self.ms_protocol.response_received.clear()
         return payload
 
+    def ms_command_send_string(self, cmd: str, value: str):
+        value_bytes = value.encode('ascii')
+        data = value_bytes.hex()
+        payload = f'{{"command":"{cmd}","data":"{data}"}}'
+        self.ms_protocol.put_command(payload)
+
+        self.ms_protocol.response_received.wait()
+        payload = self.ms_protocol.response
+        logger.info(f"MSH response: {payload}")
+        self.ms_protocol.response_received.clear()
+        return payload
+
     def ms_who_am_i(self):
         return self.ms_simple_command("WH")
 
@@ -137,8 +149,17 @@ class MShost:
     def ms_motor(self, mode:int):
         return self.ms_command_send_uint8("MT",mode)
 
+    def ms_led(self, mode:int):
+        return self.ms_command_send_uint8("LE",mode)
+
     def ms_testmode(self):
         return self.ms_simple_command("TM")
 
-    def ms_led(self, mode:int):
-        return self.ms_command_send_uint8("LE",mode)
+    def ms_reset(self):
+        return self.ms_simple_command("RS")
+
+    def ms_ota_update(self, url:str):
+        return self.ms_command_send_string("OT", url)
+
+    def ms_timezone(self, tz:str):
+        return self.ms_command_send_string("TZ", tz)
