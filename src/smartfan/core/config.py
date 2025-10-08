@@ -72,7 +72,7 @@ class Config:
         }
     }
 
-    # When adding / removing changing configuration parameters, change following validation approrpiately
+    # When adding / removing changing configuration parameters, change following validation appropriately
     CONFIG_SCHEMA = {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",

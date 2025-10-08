@@ -116,7 +116,7 @@ class TestBench:
                 testarray = self.resetwifi
 
         if not self.config['options']['nopairing']:
-            # This is called after succcessful binding and this command must be first one
+            # This is called after successful binding and this command must be first one
             # to be sent to the server before API_MQTT_READY while the window for it open.
             if not self.config['options']['noresetwifi']:
                 if not self.reset_wifi_credentials():

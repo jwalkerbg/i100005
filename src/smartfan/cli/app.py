@@ -163,7 +163,7 @@ def run_app(config:Config) -> None:
 
         tb.set_ms_host(ms_host=ms_host)
 
-        # Wait for a while to give the server chance to connecet to WiFi and MQTT broker
+        # Wait for a while to give the server chance to connect to WiFi and MQTT broker
         time.sleep(config.config['options']['dutdelay'])
 
         tb.run_tests()
