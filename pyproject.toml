@@ -25,7 +25,7 @@ importlib = ">= 1.0.4"
 paho-mqtt = ">= 2.1.0"
 jsonschema = ">= 4.25"
 types-jsonschema = ">= 4.25"
-rfc3986 = "*>= 2.0.0"
+rfc3986 = ">= 2.0.0"
 typer = "*"
 prompt-toolkit = ">=3.0.40"
 mqttms = {path = "../../100004/i100004"}
