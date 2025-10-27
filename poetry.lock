@@ -407,7 +407,7 @@ files = [
 
 [[package]]
 name = "mqttms"
-version = "3.0.3"
+version = "3.0.4"
 description = "mqttms library to handle MQTT communications and MS protocol master (client) side"
 optional = false
 python-versions = ">=3.12"
@@ -417,13 +417,13 @@ develop = false
 
 [package.dependencies]
 cython = ">=3.0"
-importlib = "*"
-jsonschema = "*"
-numpy = "*"
-paho-mqtt = "*"
-rfc3986 = "*"
+importlib = ">=1.0.4"
+jsonschema = ">=4.23.0"
+numpy = ">=2.2.0"
+paho-mqtt = ">=2.1.0"
+rfc3986 = ">=2.0.0"
 setuptools = ">=68.0.0"
-types-jsonschema = "*"
+types-jsonschema = ">=4.23.0"
 
 [package.source]
 type = "directory"
